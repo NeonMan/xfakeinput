@@ -4,3 +4,8 @@ syntax: regexp
 \.sdf$
 \.opensdf$
 \.suo$
+^Debug\/
+^Release\/
+\/Debug\/
+\/Release\/
+^ipch\/
