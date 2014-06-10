@@ -1,0 +1,6 @@
+syntax: regexp
+^__DLLs\/
+\.filters$
+\.sdf$
+\.opensdf$
+\.suo$
