@@ -23,13 +23,13 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	return TRUE;
 }
 
-void XInputEnable(
+void WINAPI XInputEnable(
 	_In_  BOOL enable
 	){
 	fake_XInputEnable(enable);
 }
 
-DWORD XInputGetCapabilities(
+DWORD WINAPI XInputGetCapabilities(
 	_In_   DWORD dwUserIndex,
 	_In_   DWORD dwFlags,
 	_Out_  x_original::XINPUT_CAPABILITIES *pCapabilities
@@ -46,7 +46,7 @@ DWORD WINAPI XInputGetDSoundAudioDeviceGuids(
 	return fake_XInputGetDSoundAudioDeviceGuids(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid, VERSION_ID);
 }
 
-DWORD XInputGetState(
+DWORD WINAPI XInputGetState(
 	_In_   DWORD dwUserIndex,
 	_Out_  x_original::XINPUT_STATE *pState
 
@@ -54,7 +54,7 @@ DWORD XInputGetState(
 	return fake_XInputGetState(dwUserIndex, pState, VERSION_ID);
 }
 
-DWORD XInputSetState(
+DWORD WINAPI XInputSetState(
 	_In_     DWORD dwUserIndex,
 	_Inout_  x_original::XINPUT_VIBRATION *pVibration
 	){

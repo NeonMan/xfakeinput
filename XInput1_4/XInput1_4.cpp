@@ -25,13 +25,13 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	return TRUE;
 }
 
-void XInputEnable(
+void WINAPI XInputEnable(
 	_In_  BOOL enable
 	){
 	fake_XInputEnable(enable);
 }
 
-DWORD XInputGetCapabilities(
+DWORD WINAPI XInputGetCapabilities(
 	_In_   DWORD dwUserIndex,
 	_In_   DWORD dwFlags,
 	_Out_  x_original::XINPUT_CAPABILITIES *pCapabilities
@@ -40,7 +40,7 @@ DWORD XInputGetCapabilities(
 	return fake_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities, VERSION_ID);
 }
 
-DWORD XInputGetState(
+DWORD WINAPI XInputGetState(
 	_In_   DWORD dwUserIndex,
 	_Out_  x_original::XINPUT_STATE *pState
 
@@ -48,7 +48,7 @@ DWORD XInputGetState(
 	return fake_XInputGetState(dwUserIndex, pState, VERSION_ID);
 }
 
-DWORD XInputSetState(
+DWORD WINAPI XInputSetState(
 	_In_     DWORD dwUserIndex,
 	_Inout_  x_original::XINPUT_VIBRATION *pVibration
 	){
@@ -62,7 +62,7 @@ DWORD WINAPI XInputGetKeystroke(
 	return fake_XInputGetKeystroke(dwUserIndex, dwReserved, pKeystroke, VERSION_ID);
 }
 
-DWORD XInputGetBatteryInformation(
+DWORD WINAPI XInputGetBatteryInformation(
 	_In_   DWORD dwUserIndex,
 	_In_   BYTE devType,
 	_Out_  x_original::XINPUT_BATTERY_INFORMATION *pBatteryInformation
@@ -70,7 +70,7 @@ DWORD XInputGetBatteryInformation(
 	return fake_XInputGetBatteryInformation(dwUserIndex, devType, pBatteryInformation, VERSION_ID);
 }
 
-DWORD XInputGetAudioDeviceIds(
+DWORD WINAPI XInputGetAudioDeviceIds(
 	_In_         DWORD dwUserIndex,
 	_Out_opt_    LPWSTR pRenderDeviceId,
 	_Inout_opt_  UINT *pRenderCount,
