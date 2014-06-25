@@ -27,6 +27,7 @@ void fake_Init(){
 	wcscat_s(dllpath, L"\\System32\\XInput1_3.dll");
 	HMODULE l = LoadLibraryW(dllpath);
 
+	//Get the functions' addresses
 	orig_XInputEnable= 
 		(void(__stdcall*)(BOOL)) GetProcAddress(l, "XInputEnable");
 	orig_XInputGetState = 
