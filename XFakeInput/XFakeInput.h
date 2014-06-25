@@ -10,6 +10,9 @@ namespace x_original{
 #include <Xinput.h>
 }
 
+//XFakeInput specific methods
+void fake_Init();
+
 /*
 * Implementation of fake xinputs follows
 */
