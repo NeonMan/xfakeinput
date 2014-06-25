@@ -10,3 +10,4 @@ syntax: regexp
 \/Release\/
 ^ipch\/
 \.user$
+\.bat$
