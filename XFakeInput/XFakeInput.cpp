@@ -1,11 +1,16 @@
 #include "XFakeInput.h"
-#include <dinput.h>
+#include "DInputLayer.h"
 #include <fstream>
+
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
 
 /*
  * Startup and globals
  */
-bool passthrough[5] = { TRUE, TRUE, TRUE, TRUE, FALSE };
+bool passthrough[5] = { FALSE, TRUE, TRUE, TRUE, FALSE };
+#define TEST_INSTANCE L"AUTO PAD"
 
 //Original xinput function pointers
 DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*) = 0;
@@ -61,7 +66,29 @@ DWORD fake_XInputGetCapabilities(
 	if (passthrough[dwUserIndex])
 		return orig_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities);
 
-	return ERROR_DEVICE_NOT_CONNECTED;
+	//Hardcoded capabilities
+	const x_original::XINPUT_GAMEPAD pad = {
+		0xFFFF,
+		0xFF,
+		0xFF,
+		0xFFFF,
+		0xFFFF,
+		0xFFFF,
+		0xFFFF
+	};
+	const x_original::XINPUT_VIBRATION vib = {
+		65535,
+		65535
+	};
+	const x_original::XINPUT_CAPABILITIES caps = {
+		XINPUT_DEVTYPE_GAMEPAD,
+		XINPUT_DEVSUBTYPE_GAMEPAD,
+		0,
+		pad,
+		vib
+	};
+	*pCapabilities = caps;
+	return ERROR_SUCCESS;
 }
 
 DWORD fake_XInputGetDSoundAudioDeviceGuids(
@@ -86,7 +113,31 @@ DWORD fake_XInputGetState(
 	if (passthrough[dwUserIndex])
 		return orig_XInputGetState(dwUserIndex, pState);
 
-	return ERROR_DEVICE_NOT_CONNECTED;
+	if (dwUserIndex > 0)
+		return ERROR_NOT_CONNECTED;
+	++packet_number;
+	pState->dwPacketNumber = packet_number;
+	// Map directInput device to xinput pad
+	DIJOYSTATE2 di_joy = get_state(TEST_INSTANCE);
+	pState->Gamepad.sThumbLX = (SHORT)((long)di_joy.lX) - 32767;
+	pState->Gamepad.sThumbLY = (SHORT)((long)di_joy.lY) - 32767;
+	pState->Gamepad.sThumbRX = (SHORT)((long)di_joy.lZ) - 32767;
+	pState->Gamepad.sThumbRY = (SHORT)((long)di_joy.lRz) - 32767;
+
+	pState->Gamepad.bLeftTrigger  = di_joy.rgbButtons[6] ? 1 : 0; //Button 7
+	pState->Gamepad.bRightTrigger = di_joy.rgbButtons[7] ? 1 : 0; //Button 8
+	WORD buttons = 0;
+	if (di_joy.rgbButtons[9]) buttons |= XINPUT_GAMEPAD_START; //Start -> 10
+	if (di_joy.rgbButtons[8]) buttons |= XINPUT_GAMEPAD_BACK;  //Back -> 9
+	if (di_joy.rgbButtons[1]) buttons |= XINPUT_GAMEPAD_A;     //A --> 2
+	if (di_joy.rgbButtons[2]) buttons |= XINPUT_GAMEPAD_B;     //B --> 3
+	if (di_joy.rgbButtons[0]) buttons |= XINPUT_GAMEPAD_X;     //X --> 1
+	if (di_joy.rgbButtons[3]) buttons |= XINPUT_GAMEPAD_Y;     //Y --> 4
+	if (di_joy.rgbButtons[4]) buttons |= XINPUT_GAMEPAD_LEFT_SHOULDER; //LShoulder --> 5
+	if (di_joy.rgbButtons[5]) buttons |= XINPUT_GAMEPAD_RIGHT_SHOULDER; //RShoulderr --> 6
+	pState->Gamepad.wButtons = buttons;
+
+	return ERROR_SUCCESS;
 }
 
 DWORD fake_XInputSetState(
@@ -97,7 +148,10 @@ DWORD fake_XInputSetState(
 	if (passthrough[dwUserIndex])
 		return orig_XInputSetState(dwUserIndex, pVibration);
 
-	return ERROR_DEVICE_NOT_CONNECTED;
+	if (dwUserIndex > 0)
+		return ERROR_NOT_CONNECTED;
+
+	return ERROR_SUCCESS;
 }
 
 DWORD fake_XInputGetKeystroke(
