@@ -1,6 +1,6 @@
 #include "XFakeInput.h"
 #include <dinput.h>
-
+#include <fstream>
 
 /*
  * Startup and globals
@@ -8,42 +8,70 @@
 bool passthrough[5] = { TRUE, TRUE, TRUE, TRUE, FALSE };
 
 //Original xinput function pointers
-void(__stdcall* orig_XInputEnable)(BOOL);
-DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*);
-DWORD(__stdcall* orig_XInputSetState)(DWORD, x_original::XINPUT_VIBRATION*);
-DWORD(__stdcall* orig_XInputGetKeyStroke)(DWORD, DWORD, x_original::PXINPUT_KEYSTROKE);
-DWORD(__stdcall* orig_XInputGetDSoundAudioDeviceGuids)(DWORD, GUID*, GUID*);
-DWORD(__stdcall* orig_XInputGetCapabilities)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*);
-DWORD(__stdcall* orig_XInputGetBatteryInformation)(DWORD, DWORD, x_original::XINPUT_BATTERY_INFORMATION*);
-DWORD(__stdcall* orig_XInputGetAudioDeviceIds)(DWORD, LPWSTR, UINT*, LPWSTR, UINT*);
+void(__stdcall* orig_XInputEnable)(BOOL) = 0;
+DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*) = 0;
+DWORD(__stdcall* orig_XInputSetState)(DWORD, x_original::XINPUT_VIBRATION*) = 0;
+DWORD(__stdcall* orig_XInputGetKeyStroke)(DWORD, DWORD, x_original::PXINPUT_KEYSTROKE) = 0;
+DWORD(__stdcall* orig_XInputGetDSoundAudioDeviceGuids)(DWORD, GUID*, GUID*) = 0;
+DWORD(__stdcall* orig_XInputGetCapabilities)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*) = 0;
+DWORD(__stdcall* orig_XInputGetBatteryInformation)(DWORD, DWORD, x_original::XINPUT_BATTERY_INFORMATION*) = 0;
+DWORD(__stdcall* orig_XInputGetAudioDeviceIds)(DWORD, LPWSTR, UINT*, LPWSTR, UINT*) = 0;
 
-void fake_Init(){
+void fake_Init(DWORD version){
 	for (int i = 0; i < 4; i++)
 		passthrough[i] = TRUE;
 
-	//Load the original DLL. Version 1.3 since it has most of the functionality
+	//Load the original DLL.
 	TCHAR dllpath[MAX_PATH];
 	GetWindowsDirectory(dllpath, MAX_PATH);
-	wcscat_s(dllpath, L"\\System32\\XInput1_3.dll");
+	switch (version){
+	case 11:
+		wcscat_s(dllpath, L"\\System32\\XInput1_1.dll");
+		break;
+	case 12:
+		wcscat_s(dllpath, L"\\System32\\XInput1_2.dll");
+		break;
+	case 13:
+	default:
+		wcscat_s(dllpath, L"\\System32\\XInput1_3.dll");
+		break;
+	case 14:
+		wcscat_s(dllpath, L"\\System32\\XInput1_4.dll");
+		break;
+	case 910:
+		wcscat_s(dllpath, L"\\System32\\XInput9_1_0.dll");
+		break;
+	}
 	HMODULE l = LoadLibraryW(dllpath);
 
 	//Get the functions' addresses
-	orig_XInputEnable= 
-		(void(__stdcall*)(BOOL)) GetProcAddress(l, "XInputEnable");
-	orig_XInputGetState = 
-		(DWORD(__stdcall*)(DWORD, x_original::XINPUT_STATE*)) GetProcAddress(l, "XInputGetState");
-	orig_XInputSetState =
-		(DWORD(__stdcall*)(DWORD, x_original::XINPUT_VIBRATION*)) GetProcAddress(l, "XInputSetState");
-	orig_XInputGetKeyStroke =
-		(DWORD(__stdcall*)(DWORD, DWORD, x_original::PXINPUT_KEYSTROKE)) GetProcAddress(l, "XInputGetKeyStroke");
-	orig_XInputGetDSoundAudioDeviceGuids =
-		(DWORD(__stdcall*)(DWORD, GUID*, GUID*)) GetProcAddress(l, "XInputGetDSoundAudioDeviceGuids");
-	orig_XInputGetCapabilities =
-		(DWORD(__stdcall*)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*)) GetProcAddress(l, "XInputGetCapabilities");
-	orig_XInputGetBatteryInformation =
-		(DWORD(__stdcall*)(DWORD, DWORD, x_original::XINPUT_BATTERY_INFORMATION*)) GetProcAddress(l, "XInputGetBatteryInformation");
-	orig_XInputGetAudioDeviceIds =
-		(DWORD(__stdcall*)(DWORD, LPWSTR, UINT*, LPWSTR, UINT*)) GetProcAddress(l, "XInputGetAudioDeviceIds");
+	if (l){
+		orig_XInputEnable =
+			(void(__stdcall*)(BOOL)) GetProcAddress(l, "XInputEnable");
+		orig_XInputGetState =
+			(DWORD(__stdcall*)(DWORD, x_original::XINPUT_STATE*)) GetProcAddress(l, "XInputGetState");
+		orig_XInputSetState =
+			(DWORD(__stdcall*)(DWORD, x_original::XINPUT_VIBRATION*)) GetProcAddress(l, "XInputSetState");
+		orig_XInputGetKeyStroke =
+			(DWORD(__stdcall*)(DWORD, DWORD, x_original::PXINPUT_KEYSTROKE)) GetProcAddress(l, "XInputGetKeyStroke");
+		orig_XInputGetDSoundAudioDeviceGuids =
+			(DWORD(__stdcall*)(DWORD, GUID*, GUID*)) GetProcAddress(l, "XInputGetDSoundAudioDeviceGuids");
+		orig_XInputGetCapabilities =
+			(DWORD(__stdcall*)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*)) GetProcAddress(l, "XInputGetCapabilities");
+		orig_XInputGetBatteryInformation =
+			(DWORD(__stdcall*)(DWORD, DWORD, x_original::XINPUT_BATTERY_INFORMATION*)) GetProcAddress(l, "XInputGetBatteryInformation");
+		orig_XInputGetAudioDeviceIds =
+			(DWORD(__stdcall*)(DWORD, LPWSTR, UINT*, LPWSTR, UINT*)) GetProcAddress(l, "XInputGetAudioDeviceIds");
+	}
+	else{
+		if (passthrough[0] || passthrough[1] || passthrough[2] || passthrough[3]){
+			MessageBoxA(NULL, "Unable to initialize original XInput. \r\nPassthrough disabled.", "Error", 0);
+			passthrough[0] = FALSE;
+			passthrough[1] = FALSE;
+			passthrough[2] = FALSE;
+			passthrough[3] = FALSE;
+		}
+	}
 }
 
 /*

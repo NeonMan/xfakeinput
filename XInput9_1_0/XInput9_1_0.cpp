@@ -16,13 +16,13 @@ namespace x_original{
 #include <Xinput.h>
 }
 
-#define VERSION_ID 9001000
+#define VERSION_ID 910
 
 BOOL APIENTRY DllMain(HANDLE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved)
 {
-	fake_Init();
+	fake_Init(VERSION_ID);
 	return TRUE;
 }
 

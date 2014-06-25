@@ -11,7 +11,7 @@ namespace x_original{
 }
 
 //XFakeInput specific methods
-void fake_Init();
+void fake_Init(DWORD version);
 
 /*
 * Implementation of fake xinputs follows

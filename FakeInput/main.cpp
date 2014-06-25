@@ -85,7 +85,7 @@ int main(){
 			cout << "    lSlider: " << joy_stat.rglSlider[0] << ", " << joy_stat.rglSlider[1] << endl;
 			cout << "       POVs: " << joy_stat.rgdwPOV[0] << ", " << joy_stat.rgdwPOV[1] << ", " << joy_stat.rgdwPOV[2] << ", " << joy_stat.rgdwPOV[3] << endl;
 			cout << "    Buttons: ";
-			for (int j = 0; j < capabilities.dwButtons; j++){
+			for (DWORD j = 0; j < capabilities.dwButtons; j++){
 				if (joy_stat.rgbButtons[j])
 					cout << "1";
 				else

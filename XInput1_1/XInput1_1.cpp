@@ -14,13 +14,13 @@ XInputSetState                  0x00403100	0x00003100	6 (0x6)
 namespace x_original{
 #include <Xinput.h>
 }
-#define VERSION_ID 1001000
+#define VERSION_ID 11
 
 BOOL APIENTRY DllMain(HANDLE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved)
 {
-	fake_Init();
+	fake_Init(VERSION_ID);
 	return TRUE;
 }
 
