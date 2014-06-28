@@ -10,13 +10,10 @@ namespace x_original{
 #include <Xinput.h>
 }
 
-/*
- * Constants
- */
-
-/**Capabilities to return when queried.
- * Copied from an actual xbox360 pad response.
- */
+// -----------------
+// --- Constants ---
+// -----------------
+///Capabilities to return when queried. Copied from an actual xbox360 pad at rest.
 const x_original::XINPUT_CAPABILITIES default_capabilities{
     (BYTE) 0x1,
     (BYTE) 0x1,
@@ -50,12 +47,29 @@ const x_original::XINPUT_STATE initial_state{
     }
 };
 
-//XFakeInput specific methods
+// ---------------
+// --- Globals ---
+// ---------------
+///Number of times fake_Init has been called
+int init_count = 0;
+///XInput passthrough enabled/disabled
+bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //{ FALSE, FALSE, FALSE, FALSE };
+///Pad states, one for each pad
+x_original::XINPUT_STATE pad_states[4];
+
+// --------------------------------------------------
+// --- Original XInputMethods' pointers (V 9.1.0) ---
+// --------------------------------------------------
+DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*) = 0;
+DWORD(__stdcall* orig_XInputSetState)(DWORD, x_original::XINPUT_VIBRATION*) = 0;
+DWORD(__stdcall* orig_XInputGetDSoundAudioDeviceGuids)(DWORD, GUID*, GUID*) = 0;
+DWORD(__stdcall* orig_XInputGetCapabilities)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*) = 0;
+
+// --------------------------
+// --- XFakeInput methods ---
+// --------------------------
 void fake_Init(DWORD version);
 
-/*
- * Fake xinputs declarations.
- */
 void fake_XInputEnable(
     BOOL enable
     );

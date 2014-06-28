@@ -1,20 +1,5 @@
 #include "XFakeInput.h"
 
-// --- XFakeInput globals --- (Move to header?)
-
-///Number of times fake_Init has been called
-int init_count = 0;
-///XInput passthrough enabled/disabled
-bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //{ FALSE, FALSE, FALSE, FALSE };
-///Pad states, one for each pad
-x_original::XINPUT_STATE pad_states[4];
-
-//Original xinput function pointers
-DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*) = 0;
-DWORD(__stdcall* orig_XInputSetState)(DWORD, x_original::XINPUT_VIBRATION*) = 0;
-DWORD(__stdcall* orig_XInputGetDSoundAudioDeviceGuids)(DWORD, GUID*, GUID*) = 0;
-DWORD(__stdcall* orig_XInputGetCapabilities)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*) = 0;
-
 #undef ENABLE_LOGGING
 #ifdef ENABLE_LOGGING
 #include <stdio.h>
@@ -87,7 +72,7 @@ void fake_Init(DWORD version){
             if (passthrough[0] || passthrough[1] || passthrough[2] || passthrough[3]){
 #ifdef ENABLE_LOGGING
                 char msg[1024];
-                sprintf(msg, "@fake_init: Failed to llocate xinput functions\n");
+                sprintf(msg, "@fake_init: Failed to locate xinput functions\n");
                 log(msg);
 #endif
                 passthrough[0] = FALSE;
