@@ -14,8 +14,8 @@ namespace x_original{
  * Constants
  */
 
-/**Capabilities to return when queried
- * copied from an actual xbox360 pad response.
+/**Capabilities to return when queried.
+ * Copied from an actual xbox360 pad response.
  */
 const x_original::XINPUT_CAPABILITIES default_capabilities{
 	(BYTE) 0x1,

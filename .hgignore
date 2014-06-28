@@ -11,3 +11,4 @@ syntax: regexp
 ^ipch\/
 \.user$
 \.bat$
+\.log$
