@@ -47,24 +47,6 @@ const x_original::XINPUT_STATE initial_state{
     }
 };
 
-// ---------------
-// --- Globals ---
-// ---------------
-///Number of times fake_Init has been called
-int init_count = 0;
-///XInput passthrough enabled/disabled
-bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //{ FALSE, FALSE, FALSE, FALSE };
-///Pad states, one for each pad
-x_original::XINPUT_STATE pad_states[4];
-
-// --------------------------------------------------
-// --- Original XInputMethods' pointers (V 9.1.0) ---
-// --------------------------------------------------
-DWORD(__stdcall* orig_XInputGetState)(DWORD, x_original::XINPUT_STATE*) = 0;
-DWORD(__stdcall* orig_XInputSetState)(DWORD, x_original::XINPUT_VIBRATION*) = 0;
-DWORD(__stdcall* orig_XInputGetDSoundAudioDeviceGuids)(DWORD, GUID*, GUID*) = 0;
-DWORD(__stdcall* orig_XInputGetCapabilities)(DWORD, DWORD, x_original::XINPUT_CAPABILITIES*) = 0;
-
 // --------------------------
 // --- XFakeInput methods ---
 // --------------------------
