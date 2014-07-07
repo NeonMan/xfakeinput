@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <Windows.h>
 #include <iostream>
+#include <mutex>
 using namespace std;
 
 #include <dinput.h>
@@ -36,6 +37,7 @@ LPDIRECTINPUT8 di;
 #define MAX_JOY 32
 LPDIRECTINPUTDEVICE8 joysticks[MAX_JOY];
 int joy_count = 0;
+std::mutex mtx;
 // ---------------
 
 BOOL CALLBACK
@@ -61,6 +63,8 @@ enumCallback(const DIDEVICEINSTANCE* instance, VOID* context)
 }
 
 int main(){
+    mtx.lock();
+    mtx.unlock();
     //Clear arrays
     memset(joysticks, 0, sizeof(LPDIRECTINPUTDEVICE8)* MAX_JOY);
     //Initialize dInput

@@ -32,10 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ---------------
 ///The pad state lock
 std::mutex mutex_state;
+///Is DirectInput initialized?
+bool bDirectInput_started = FALSE;
 ///Number of times fake_Init has been called
 int init_count = 0;
 ///XInput passthrough enabled/disabled
-bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //{ FALSE, FALSE, FALSE, FALSE };
+bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //bool passthrough[4] = { FALSE, FALSE, FALSE, FALSE };
 ///Pad states, one for each pad
 x_original::XINPUT_STATE pad_states[4];
 
@@ -73,10 +75,9 @@ int log(char* msg){
  * Should be called by each XInput clone when loaded. For some reason
  * multiple calls to this function will happen so multiple initializations
  * must be detected and ignored.
+ * DLLMAIN is serialized, so apparently no locks/mutex are needed.
  */
 void fake_Init(DWORD version){
-    //Acquire the state lock
-    mutex_state.lock();
     if (init_count){
         ++init_count;
         return;
@@ -148,7 +149,13 @@ void fake_Init(DWORD version){
     sprintf(msg, "@fake_init: Done!\n");
     log(msg);
 #endif
-    mutex_state.unlock();
+}
+
+/**
+ * Initialize DirectInput
+ */
+void directInput_init(){
+    bDirectInput_started = TRUE;
 }
 
 /*
@@ -217,6 +224,10 @@ DWORD fake_XInputGetCapabilities(
     sprintf(msg, "@fake_XinputGetCapabilities: ERROR_DEVICE_NOT_CONNECTED\n");
     log(msg);
 #endif
+    //Not passthrough
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    mutex_state.unlock();
     return ERROR_DEVICE_NOT_CONNECTED;
 }
 
@@ -244,6 +255,7 @@ DWORD fake_XInputGetDSoundAudioDeviceGuids(
     if (passthrough[dwUserIndex])
         return orig_XInputGetDSoundAudioDeviceGuids(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid);
 
+    //Not passthrough
     return ERROR_DEVICE_NOT_CONNECTED;
 
     //Return this if device connected
@@ -295,6 +307,10 @@ DWORD fake_XInputGetState(
     sprintf(msg, "@fake_XinputGetState: ERROR_DEVICE_NOT_CONNECTED\n");
     log(msg);
 #endif
+    //Not passthrough
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    mutex_state.unlock();
     return ERROR_DEVICE_NOT_CONNECTED;
 }
 
@@ -320,6 +336,10 @@ DWORD fake_XInputSetState(
     if (passthrough[dwUserIndex])
         return orig_XInputSetState(dwUserIndex, pVibration);
 
+    //Not passthrough
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    mutex_state.unlock();
     return ERROR_DEVICE_NOT_CONNECTED;
 }
 
