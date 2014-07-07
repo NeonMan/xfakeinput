@@ -63,8 +63,6 @@ enumCallback(const DIDEVICEINSTANCE* instance, VOID* context)
 }
 
 int main(){
-    mtx.lock();
-    mtx.unlock();
     //Clear arrays
     memset(joysticks, 0, sizeof(LPDIRECTINPUTDEVICE8)* MAX_JOY);
     //Initialize dInput

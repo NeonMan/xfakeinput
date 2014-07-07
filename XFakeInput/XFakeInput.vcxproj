@@ -76,9 +76,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DInput_layer.h" />
     <ClInclude Include="XFakeInput.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DInput_layer.cpp" />
     <ClCompile Include="XFakeInput.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

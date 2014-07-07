@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "XFakeInput.h"
+#include "DInput_layer.h"
 #include <mutex>
 
 // ---------------
@@ -37,7 +38,8 @@ bool bDirectInput_started = FALSE;
 ///Number of times fake_Init has been called
 int init_count = 0;
 ///XInput passthrough enabled/disabled
-bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //bool passthrough[4] = { FALSE, FALSE, FALSE, FALSE };
+//bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //
+bool passthrough[4] = { FALSE, FALSE, FALSE, FALSE };
 ///Pad states, one for each pad
 x_original::XINPUT_STATE pad_states[4];
 
@@ -152,9 +154,15 @@ void fake_Init(DWORD version){
 }
 
 /**
- * Initialize DirectInput
+ * @brief Initialize DirectInput.
  */
 void directInput_init(){
+#ifdef ENABLE_LOGGING
+    char msg[1024];
+    sprintf(msg, "@directInput_init: Initializing DirectInput\n");
+    log(msg);
+#endif
+    dinput_init();
     bDirectInput_started = TRUE;
 }
 
