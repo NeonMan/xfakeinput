@@ -39,13 +39,12 @@ XInputSetState                  0x00403100    0x00003100    6 (0x6)
 namespace x_original{
 #include <Xinput.h>
 }
-#define VERSION_ID 11
 
 BOOL APIENTRY DllMain(HANDLE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved)
 {
-    fake_Init(VERSION_ID);
+    fake_Init(FXINPUT_V1_1);
     return TRUE;
 }
 
@@ -61,7 +60,7 @@ DWORD WINAPI XInputGetCapabilities(
     _Out_  x_original::XINPUT_CAPABILITIES *pCapabilities
 
     ){
-    return fake_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities, VERSION_ID);
+    return fake_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities, FXINPUT_V1_1);
 }
 
 DWORD WINAPI XInputGetDSoundAudioDeviceGuids(
@@ -69,7 +68,7 @@ DWORD WINAPI XInputGetDSoundAudioDeviceGuids(
     GUID* pDSoundRenderGuid,
     GUID* pDSoundCaptureGuid
     ){
-    return fake_XInputGetDSoundAudioDeviceGuids(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid, VERSION_ID);
+    return fake_XInputGetDSoundAudioDeviceGuids(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid, FXINPUT_V1_1);
 }
 
 DWORD WINAPI XInputGetState(
@@ -77,12 +76,12 @@ DWORD WINAPI XInputGetState(
     _Out_  x_original::XINPUT_STATE *pState
 
     ){
-    return fake_XInputGetState(dwUserIndex, pState, VERSION_ID);
+    return fake_XInputGetState(dwUserIndex, pState, FXINPUT_V1_1);
 }
 
 DWORD WINAPI XInputSetState(
     _In_     DWORD dwUserIndex,
     _Inout_  x_original::XINPUT_VIBRATION *pVibration
     ){
-    return fake_XInputSetState(dwUserIndex, pVibration, VERSION_ID);
+    return fake_XInputSetState(dwUserIndex, pVibration, FXINPUT_V1_1);
 }

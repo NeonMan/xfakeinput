@@ -27,6 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __XFakeInput_h
 #define __XFakeInput_h
 
+//Version ID definitions
+#define FXINPUT_V1_1   11
+#define FXINPUT_V1_2   12
+#define FXINPUT_V1_3   13
+#define FXINPUT_V1_4   14
+#define FXINPUT_V9_1_0 910
+
 #include <Windows.h>
 #include <stdint.h>
 

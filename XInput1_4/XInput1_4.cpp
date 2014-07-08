@@ -41,13 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace x_original{
 #include <Xinput.h>
 }
-#define VERSION_ID 14
 
 BOOL APIENTRY DllMain(HANDLE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved)
 {
-    fake_Init(VERSION_ID);
+    fake_Init(FXINPUT_V1_4);
     return TRUE;
 }
 
@@ -63,7 +62,7 @@ DWORD WINAPI XInputGetCapabilities(
     _Out_  x_original::XINPUT_CAPABILITIES *pCapabilities
 
     ){
-    return fake_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities, VERSION_ID);
+    return fake_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities, FXINPUT_V1_4);
 }
 
 DWORD WINAPI XInputGetState(
@@ -71,21 +70,21 @@ DWORD WINAPI XInputGetState(
     _Out_  x_original::XINPUT_STATE *pState
 
     ){
-    return fake_XInputGetState(dwUserIndex, pState, VERSION_ID);
+    return fake_XInputGetState(dwUserIndex, pState, FXINPUT_V1_4);
 }
 
 DWORD WINAPI XInputSetState(
     _In_     DWORD dwUserIndex,
     _Inout_  x_original::XINPUT_VIBRATION *pVibration
     ){
-    return fake_XInputSetState(dwUserIndex, pVibration, VERSION_ID);
+    return fake_XInputSetState(dwUserIndex, pVibration, FXINPUT_V1_4);
 }
 
 DWORD WINAPI XInputGetKeystroke(
     DWORD dwUserIndex,
     DWORD dwReserved,
     x_original::PXINPUT_KEYSTROKE pKeystroke){
-    return fake_XInputGetKeystroke(dwUserIndex, dwReserved, pKeystroke, VERSION_ID);
+    return fake_XInputGetKeystroke(dwUserIndex, dwReserved, pKeystroke, FXINPUT_V1_4);
 }
 
 DWORD WINAPI XInputGetBatteryInformation(
@@ -93,7 +92,7 @@ DWORD WINAPI XInputGetBatteryInformation(
     _In_   BYTE devType,
     _Out_  x_original::XINPUT_BATTERY_INFORMATION *pBatteryInformation
     ){
-    return fake_XInputGetBatteryInformation(dwUserIndex, devType, pBatteryInformation, VERSION_ID);
+    return fake_XInputGetBatteryInformation(dwUserIndex, devType, pBatteryInformation, FXINPUT_V1_4);
 }
 
 DWORD WINAPI XInputGetAudioDeviceIds(
@@ -105,6 +104,6 @@ DWORD WINAPI XInputGetAudioDeviceIds(
     ){
 
     return fake_XInputGetAudioDeviceIds(
-        dwUserIndex, pRenderDeviceId, pRenderCount, pCaptureDeviceId, pCaptureCount, VERSION_ID
+        dwUserIndex, pRenderDeviceId, pRenderCount, pCaptureDeviceId, pCaptureCount, FXINPUT_V1_4
         );
 }
