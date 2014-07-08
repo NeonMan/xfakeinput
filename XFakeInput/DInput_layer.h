@@ -35,7 +35,6 @@ int dinput_init();
 
 DWORD dinput_XInputGetState(
     DWORD dwUserIndex,
-    x_original::XINPUT_STATE *pState_old,
     x_original::XINPUT_STATE *pState_new
     );
 

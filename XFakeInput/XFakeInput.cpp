@@ -166,6 +166,25 @@ void directInput_init(){
     bDirectInput_started = TRUE;
 }
 
+/**
+ * @brief Test if two XINPUT_GAMEPAD structs are equal.
+ * 
+ * @param p1 Pad structure
+ * @param p2 Pad structure
+ * @return TRUE if both structs are equal.
+ */
+inline bool gamepad_equals(x_original::XINPUT_GAMEPAD p1, x_original::XINPUT_GAMEPAD p2){
+    bool rv = TRUE;
+    rv &= p1.bLeftTrigger == p2.bLeftTrigger;
+    rv &= p1.bRightTrigger == p2.bRightTrigger;
+    rv &= p1.sThumbLX == p2.sThumbLX;
+    rv &= p1.sThumbLY == p2.sThumbLY;
+    rv &= p1.sThumbRX == p2.sThumbRX;
+    rv &= p1.sThumbRY == p2.sThumbRY;
+    rv &= p1.wButtons == p2.wButtons;
+    return rv;
+}
+
 /******************************************\
  * Implementation of fake xinputs follows *
 \******************************************/
@@ -219,9 +238,17 @@ DWORD fake_XInputGetState(
     //Not passthrough
     mutex_state.lock();
     if (!bDirectInput_started) directInput_init();
-    rv = dinput_XInputGetState(dwUserIndex, pad_states + dwUserIndex, pState);
-    if (rv == ERROR_SUCCESS)
-        pad_states[dwUserIndex] = *pState;
+    //Get the new State
+    *pState = pad_states[dwUserIndex];
+    rv = dinput_XInputGetState(dwUserIndex, pState);
+    if (rv == ERROR_SUCCESS){
+        //Check if old state is different from the new one.
+        //If so, increment packet ID and replace the old state with the new one.
+        if (!gamepad_equals(pState->Gamepad, pad_states[dwUserIndex].Gamepad)){
+            pState->dwPacketNumber = pad_states[dwUserIndex].dwPacketNumber + 2;
+            pad_states[dwUserIndex] = *pState;
+        }
+    }
     mutex_state.unlock();
     return rv;
 }

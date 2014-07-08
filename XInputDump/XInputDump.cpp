@@ -77,7 +77,7 @@ void main(){
                 printf("Pad #%d: --- Not connected ---\r\n", i);
             }
             else{
-                printf("Pad #%d: ID:0x%X LX:%d LY:%d RX:%d RY:%d RT:%d LT:%d\r\n",
+                printf("Pad #%d: ID:%d LX:%d LY:%d RX:%d RY:%d RT:%d LT:%d\r\n",
                     i,                       /*Pad #*/
                     s.dwPacketNumber,        /*Packet #*/
                     s.Gamepad.sThumbLX,      /*LX*/

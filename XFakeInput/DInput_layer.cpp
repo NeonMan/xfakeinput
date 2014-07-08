@@ -176,25 +176,16 @@ inline WORD  convert_POV(DWORD pov){
  */
 DWORD dinput_XInputGetState(
     DWORD dwUserIndex,
-    x_original::XINPUT_STATE *pState_old,
     x_original::XINPUT_STATE *pState_new
     ){
     if (dwUserIndex != 0)
         return ERROR_DEVICE_NOT_CONNECTED;
-    //If this is changed, the new state increments its ID
-    bool state_changed = FALSE;
-    //Copy the old state to the new one
-    *pState_new = *pState_old;
 
     //Poll pad state
     lpJoysticks[0]->Poll();
     DIJOYSTATE2 joy_stat;
     lpJoysticks[0]->GetDeviceState(sizeof(DIJOYSTATE2), &joy_stat);
     //Make the DInput --> XInput conversion
-
-
-    //POV: #1 [0,18000)
-
 
     //Axis: X(RX),Y(RY),Z(LX),rZ(LY)
     pState_new->Gamepad.sThumbLX = convert_axis(joy_stat.lX);
@@ -218,10 +209,6 @@ DWORD dinput_XInputGetState(
     pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[10] ? XINPUT_GAMEPAD_LEFT_THUMB : 0;
     pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[11] ? XINPUT_GAMEPAD_RIGHT_THUMB : 0;
     pState_new->Gamepad.wButtons |= convert_POV(joy_stat.rgdwPOV[0]);
-    state_changed = TRUE;
-    //Increment ID to signal that the pad state has changed.
-    if (state_changed)
-        pState_new->dwPacketNumber += 2;
     return ERROR_SUCCESS;
 }
 
