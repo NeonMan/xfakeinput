@@ -83,6 +83,9 @@
     <ClCompile Include="DInput_layer.cpp" />
     <ClCompile Include="XFakeInput.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="scratchpad.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -26,6 +26,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __DINPUT_LAYER
 #define __DINPUT_LAYER
 
+#include <Windows.h>
+namespace x_original{
+#include <Xinput.h>
+}
+
 int dinput_init();
+
+DWORD dinput_XInputGetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_STATE *pState_old,
+    x_original::XINPUT_STATE *pState_new
+    );
+
+DWORD dinput_XInputSetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_VIBRATION *pVibration
+    );
 
 #endif

@@ -25,18 +25,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "DInput_layer.h"
 #include <Windows.h>
+#include <cmath>
 /// @note Select DirectInput version
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
 // --- DInput layer globals ---
-int iJoyCount;
-LPDIRECTINPUT8 di;
+int iJoyCount;       ///<-- Number of DirectInput joypads
+LPDIRECTINPUT8 di;   ///<-- DirectInput object
 #define MAX_JOY 32
-LPDIRECTINPUTDEVICE8 lpJoysticks[MAX_JOY];
-DIDEVICEINSTANCEW diJoyInfos[MAX_JOY];
-DIDEVCAPS diJoyCaps[MAX_JOY];
+LPDIRECTINPUTDEVICE8 lpJoysticks[MAX_JOY]; ///<-- Joystick objects
+DIDEVICEINSTANCEW diJoyInfos[MAX_JOY];     ///<-- Joystick info structs
+DIDEVCAPS diJoyCaps[MAX_JOY];              ///<-- Joystick capabilities structs
 // ----------------------------
 
 /**
@@ -87,6 +88,7 @@ int dinput_init(){
         return -2;
     }
 
+    //Why not a single for loop? Readability, maybe...
     //Configure (set data format)
     for (int i = 0; i < iJoyCount; i++){
         if ( FAILED(hr = lpJoysticks[i]->SetDataFormat(&c_dfDIJoystick2)) ){
@@ -122,6 +124,116 @@ int dinput_init(){
         if (FAILED(hr = lpJoysticks[i]->GetCapabilities(diJoyCaps + i))){
             return -7;
         }
-    }
+    }   
+
+    //Load configuration
+    ///@ToDo load DInput-to-XInput mappings
     return 0;
+}
+
+/**
+ * @brief Converts axis values from DInput ranges to XInput ranges.
+ * 
+ * @param v DirectInput axis value [0,65535]
+ * @return XInput axis value [–32768,32767]
+ */
+inline SHORT convert_axis(LONG v){
+    LONG shortened_axis = (v & 0x0000FFFF) - 32768;
+    return ((SHORT)shortened_axis) == -32768 ? -32767 : ((SHORT)shortened_axis);
+}
+
+/**
+ * @brief Converts a POV value to XInput DPAD
+ *
+ * @param pov a DInput POV value
+ * @return A button mask
+ */
+inline WORD  convert_POV(DWORD pov){
+    if (pov <= 3000)
+        return XINPUT_GAMEPAD_DPAD_UP;
+    else if (pov <= 6000)
+        return XINPUT_GAMEPAD_DPAD_UP | XINPUT_GAMEPAD_DPAD_RIGHT;
+    else if (pov <= 12000)
+        return XINPUT_GAMEPAD_DPAD_RIGHT;
+    else if (pov <= 15000)
+        return XINPUT_GAMEPAD_DPAD_RIGHT | XINPUT_GAMEPAD_DPAD_DOWN;
+    else if (pov <= 21000)
+        return XINPUT_GAMEPAD_DPAD_DOWN;
+    else if (pov <= 24000)
+        return XINPUT_GAMEPAD_DPAD_DOWN | XINPUT_GAMEPAD_DPAD_LEFT;
+    else if (pov <= 30000)
+        return XINPUT_GAMEPAD_DPAD_LEFT;
+    else if (pov <= 33000)
+        return XINPUT_GAMEPAD_DPAD_LEFT | XINPUT_GAMEPAD_DPAD_UP;
+    else if (pov <= 35900)
+        return XINPUT_GAMEPAD_DPAD_UP;
+    else
+        return 0;
+}
+/**
+ * @brief Translate a directInput device to XInput struct
+ * @fixme Hardcoded to my current gamepad.
+ */
+DWORD dinput_XInputGetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_STATE *pState_old,
+    x_original::XINPUT_STATE *pState_new
+    ){
+    if (dwUserIndex != 0)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    //If this is changed, the new state increments its ID
+    bool state_changed = FALSE;
+    //Copy the old state to the new one
+    *pState_new = *pState_old;
+
+    //Poll pad state
+    lpJoysticks[0]->Poll();
+    DIJOYSTATE2 joy_stat;
+    lpJoysticks[0]->GetDeviceState(sizeof(DIJOYSTATE2), &joy_stat);
+    //Make the DInput --> XInput conversion
+
+
+    //POV: #1 [0,18000)
+
+
+    //Axis: X(RX),Y(RY),Z(LX),rZ(LY)
+    pState_new->Gamepad.sThumbLX = convert_axis(joy_stat.lX);
+    pState_new->Gamepad.sThumbLY = - convert_axis(joy_stat.lY);
+    pState_new->Gamepad.sThumbRX = convert_axis(joy_stat.lZ);
+    pState_new->Gamepad.sThumbRY = - convert_axis(joy_stat.lRz);
+
+    //Buttons: A  B  X  Y  Ba  St  LS  RS  LB  RB  LT  RT
+    //BTN #:   2  3  1  4  9   10  5   6   11  12  7   8
+    pState_new->Gamepad.bLeftTrigger = joy_stat.rgbButtons[6] ? 255 : 0;
+    pState_new->Gamepad.bRightTrigger = joy_stat.rgbButtons[7] ? 255 : 0;
+    pState_new->Gamepad.wButtons = 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[1] ? XINPUT_GAMEPAD_A : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[2] ? XINPUT_GAMEPAD_B : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[0] ? XINPUT_GAMEPAD_X : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[3] ? XINPUT_GAMEPAD_Y : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[8] ? XINPUT_GAMEPAD_BACK : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[9] ? XINPUT_GAMEPAD_START : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[4] ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[5] ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[10] ? XINPUT_GAMEPAD_LEFT_THUMB : 0;
+    pState_new->Gamepad.wButtons |= joy_stat.rgbButtons[11] ? XINPUT_GAMEPAD_RIGHT_THUMB : 0;
+    pState_new->Gamepad.wButtons |= convert_POV(joy_stat.rgdwPOV[0]);
+    state_changed = TRUE;
+    //Increment ID to signal that the pad state has changed.
+    if (state_changed)
+        pState_new->dwPacketNumber += 2;
+    return ERROR_SUCCESS;
+}
+
+/**
+ * @brief Accept data from XInput (does nothing right now...)
+ */
+DWORD dinput_XInputSetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_VIBRATION *pVibration
+    ){
+    if (dwUserIndex != 0)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    else
+        return ERROR_SUCCESS;
 }

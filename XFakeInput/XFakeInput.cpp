@@ -40,7 +40,7 @@ int init_count = 0;
 ///XInput passthrough enabled/disabled
 //bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //
 bool passthrough[4] = { FALSE, FALSE, FALSE, FALSE };
-///Pad states, one for each pad
+///Old pad states, one for each pad
 x_original::XINPUT_STATE pad_states[4];
 
 // --------------------------------------------------
@@ -166,9 +166,97 @@ void directInput_init(){
     bDirectInput_started = TRUE;
 }
 
-/*
-* Implementation of fake xinputs follows
+/******************************************\
+ * Implementation of fake xinputs follows *
+\******************************************/
+
+/**
+* @brief Returns the current pad state.
+* @note Available on: XInput 1.1, 1.2, 1.3, 1.4, 9.1.0
+*
+* @param dwUserIndex    xbox pad number.
+* @param pState         pointer to the pad state struct to be written.
+* @param caller_version which XInput version is being emulated.
+*
+* @returns ERROR_SUCCESS or ERROR_DEVICE_NOT_CONNECTED
+*
+* pState->dwPacketNumber seems to be always even, increments by two, starting as 2.
 */
+DWORD fake_XInputGetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_STATE *pState,
+    DWORD caller_version
+    ){
+#ifdef ENABLE_LOGGING
+    sprintf(msg, "@fake_XInputGetState: Pad #%d\n", dwUserIndex);
+    log(msg);
+#endif
+    DWORD rv;
+    if (dwUserIndex > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    if (passthrough[dwUserIndex]){
+        rv = orig_XInputGetState(dwUserIndex, pState);
+#ifdef ENABLE_LOGGING
+        sprintf(msg, "@fake_XinputGetState: #%X {%X %X %X %X %X %X %X} [%d] (Passthrough)\n",
+            pState->dwPacketNumber,
+            pState->Gamepad.wButtons,
+            pState->Gamepad.bLeftTrigger,
+            pState->Gamepad.bRightTrigger,
+            pState->Gamepad.sThumbRX,
+            pState->Gamepad.sThumbRY,
+            pState->Gamepad.sThumbLX,
+            pState->Gamepad.sThumbLY,
+            rv
+            );
+        log(msg);
+#endif
+        return rv;
+    }
+#ifdef ENABLE_LOGGING
+    sprintf(msg, "@fake_XinputGetState: ERROR_DEVICE_NOT_CONNECTED\n");
+    log(msg);
+#endif
+    //Not passthrough
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    rv = dinput_XInputGetState(dwUserIndex, pad_states + dwUserIndex, pState);
+    if (rv == ERROR_SUCCESS)
+        pad_states[dwUserIndex] = *pState;
+    mutex_state.unlock();
+    return rv;
+}
+
+/**
+* @brief Sends data to the pad (vibration)
+* @note Available on: XInput 1.1, 1.2, 1.3, 1.4, 9.1.0
+*
+* @param dwUserIndex    xbox pad number.
+* @param pVibration     vibration speed struct pointer.
+* @param caller_version which XInput version is being emulated.
+*
+* @returns ERROR_SUCCESS or ERROR_DEVICE_NOT_CONNECTED
+*/
+DWORD fake_XInputSetState(
+    DWORD dwUserIndex,
+    x_original::XINPUT_VIBRATION *pVibration,
+    DWORD caller_version
+    ){
+#ifdef ENABLE_LOGGING
+    sprintf(msg, "@fake_XinputSetState: FIXME!\n");
+    log(msg);
+#endif
+    if (dwUserIndex > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    if (passthrough[dwUserIndex])
+        return orig_XInputSetState(dwUserIndex, pVibration);
+
+    //Not passthrough
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    DWORD rv = dinput_XInputSetState(dwUserIndex, pVibration);
+    mutex_state.unlock();
+    return rv;
+}
 
 /**
  * @brief Provides XInputEnable to clone DLLs.
@@ -233,10 +321,13 @@ DWORD fake_XInputGetCapabilities(
     log(msg);
 #endif
     //Not passthrough
+    if (dwUserIndex > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
     mutex_state.lock();
     if (!bDirectInput_started) directInput_init();
     mutex_state.unlock();
-    return ERROR_DEVICE_NOT_CONNECTED;
+    *pCapabilities = default_capabilities;
+    return ERROR_SUCCESS;
 }
 
 /**
@@ -264,91 +355,11 @@ DWORD fake_XInputGetDSoundAudioDeviceGuids(
         return orig_XInputGetDSoundAudioDeviceGuids(dwUserIndex, pDSoundRenderGuid, pDSoundCaptureGuid);
 
     //Not passthrough
-    return ERROR_DEVICE_NOT_CONNECTED;
-
-    //Return this if device connected
-    //*pDSoundRenderGuid = GUID_NULL;
-    //*pDSoundCaptureGuid = GUID_NULL;
-    //return ERROR_SUCCESS;
-}
-
-/**
- * @brief Returns the current pad state.
- * @note Available on: XInput 1.1, 1.2, 1.3, 1.4, 9.1.0
- *
- * @param dwUserIndex    xbox pad number.
- * @param pState         pointer to the pad state struct to be written.
- * @param caller_version which XInput version is being emulated.
- *
- * @returns ERROR_SUCCESS or ERROR_DEVICE_NOT_CONNECTED
- *
- * pState->dwPacketNumber seems to be always even, increments by two, starting as 2.
- */
-DWORD fake_XInputGetState(
-    DWORD dwUserIndex,
-    x_original::XINPUT_STATE *pState,
-    DWORD caller_version
-    ){
-#ifdef ENABLE_LOGGING
-    sprintf(msg, "@fake_XInputGetState: Pad #%d\n", dwUserIndex);
-    log(msg);
-#endif
-    if (passthrough[dwUserIndex]){
-        DWORD rv = orig_XInputGetState(dwUserIndex, pState);
-#ifdef ENABLE_LOGGING
-        sprintf(msg, "@fake_XinputGetState: #%X {%X %X %X %X %X %X %X} [%d] (Passthrough)\n",
-            pState->dwPacketNumber,
-            pState->Gamepad.wButtons,
-            pState->Gamepad.bLeftTrigger,
-            pState->Gamepad.bRightTrigger,
-            pState->Gamepad.sThumbRX,
-            pState->Gamepad.sThumbRY,
-            pState->Gamepad.sThumbLX,
-            pState->Gamepad.sThumbLY,
-            rv
-            );
-        log(msg);
-#endif
-        return rv;
-    }
-#ifdef ENABLE_LOGGING
-    sprintf(msg, "@fake_XinputGetState: ERROR_DEVICE_NOT_CONNECTED\n");
-    log(msg);
-#endif
-    //Not passthrough
-    mutex_state.lock();
-    if (!bDirectInput_started) directInput_init();
-    mutex_state.unlock();
-    return ERROR_DEVICE_NOT_CONNECTED;
-}
-
-/**
- * @brief Sends data to the pad (vibration)
- * @note Available on: XInput 1.1, 1.2, 1.3, 1.4, 9.1.0
- *
- * @param dwUserIndex    xbox pad number.
- * @param pVibration     vibration speed struct pointer.
- * @param caller_version which XInput version is being emulated.
- *
- * @returns ERROR_SUCCESS or ERROR_DEVICE_NOT_CONNECTED
- */
-DWORD fake_XInputSetState(
-    DWORD dwUserIndex,
-    x_original::XINPUT_VIBRATION *pVibration,
-    DWORD caller_version
-    ){
-#ifdef ENABLE_LOGGING
-    sprintf(msg, "@fake_XinputSetState: FIXME!\n");
-    log(msg);
-#endif
-    if (passthrough[dwUserIndex])
-        return orig_XInputSetState(dwUserIndex, pVibration);
-
-    //Not passthrough
-    mutex_state.lock();
-    if (!bDirectInput_started) directInput_init();
-    mutex_state.unlock();
-    return ERROR_DEVICE_NOT_CONNECTED;
+    if (dwUserIndex > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    *pDSoundRenderGuid = GUID_NULL;
+    *pDSoundCaptureGuid = GUID_NULL;
+    return ERROR_SUCCESS;
 }
 
 /**
@@ -371,10 +382,9 @@ DWORD fake_XInputGetKeystroke(
     sprintf(msg, "@fake_XinputGetKeyStroke: Begin/End\n");
     log(msg);
 #endif
-    return ERROR_DEVICE_NOT_CONNECTED;
-
-    //Return when device is connected
-    //return ERROR_EMPTY;
+    if (dwUserIndex > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    return ERROR_EMPTY;
 }
 
 /**
