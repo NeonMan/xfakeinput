@@ -125,9 +125,6 @@ int dinput_init(){
             return -7;
         }
     }   
-
-    //Load configuration
-    ///@ToDo load DInput-to-XInput mappings
     return 0;
 }
 

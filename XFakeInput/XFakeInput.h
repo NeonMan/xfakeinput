@@ -83,6 +83,11 @@ const x_original::XINPUT_STATE initial_state{
 // --- XFakeInput methods ---
 // --------------------------
 void fake_Init(DWORD version);
+void fake_Cleanup();
+
+// --------------------------------------
+// --- Reimplemented XInput functions ---
+// --------------------------------------
 
 void fake_XInputEnable(
     BOOL enable

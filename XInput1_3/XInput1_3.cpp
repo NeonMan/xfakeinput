@@ -46,7 +46,10 @@ BOOL APIENTRY DllMain(HANDLE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved)
 {
-    fake_Init(FXINPUT_V1_3);
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
+        fake_Init(FXINPUT_V1_3);
+    else if (ul_reason_for_call == DLL_PROCESS_DETACH)
+        fake_Cleanup();
     return TRUE;
 }
 
