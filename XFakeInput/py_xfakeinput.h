@@ -38,11 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "XFakeInput.h"
 
-// ---------------------------------------------------------------
-// --- XFakeInput functions exported to the python interpreter ---
-// ---------------------------------------------------------------
+// ----------------------------------------------------------
+// --- Variables and functions to setup the python module ---
+// ----------------------------------------------------------
 
 extern PyModuleDef XFIModule;  ///<-- module struct
 extern PyMethodDef XFIMethods[]; ///<-- Methods array
 PyObject* PyInit_xfi(void);
+
 #endif

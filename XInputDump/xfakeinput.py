@@ -43,6 +43,13 @@ sample_state = { \
   'ThumbRY' : 0, \
 }
 
+#Print the number of configured devices
+print("DInput devices:", dinput.num_devices())
+
+#Print the info about the first device
+print("Device #0 info:")
+print(dinput.device_info(0))
+
 def get_state():
   '''Return the pad state'''
   return sample_state

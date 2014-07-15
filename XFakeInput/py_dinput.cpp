@@ -53,14 +53,70 @@ PyObject* PyInit_dinput(void){
 // ----------------------------
 // --- Function definitions ---
 // ----------------------------
+
+/**
+ * @brief Provide the number of configured DirectInput devices
+ */
 PyObject* di_num_devices(PyObject *self, PyObject *args){
-    PyErr_SetString(PyExc_RuntimeError, "Unimplemented");
-    return NULL;
+    PyObject* v = PyLong_FromLong(iJoyCount);
+    return v;
 }
 
+/**
+ * @brief Provide a dictionary with the extracted DirectInput information.
+ */
 PyObject* di_device_info(PyObject *self, PyObject *args){
-    PyErr_SetString(PyExc_RuntimeError, "Unimplemented");
-    return NULL;
+    PyObject* po_number;
+    //Function has only one parameter (integer)
+    if (!PyArg_UnpackTuple(args, "device_number", 1, 1, &po_number))
+        return NULL;
+    //Check if it is an integer
+    if (!PyLong_Check(po_number)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be an integer");
+        return NULL;
+    }
+    //Extract the value
+    long device_number = PyLong_AsLong(po_number);
+    //Device number in range?
+    if ((device_number >= iJoyCount) || (device_number < 0)){
+        PyErr_SetString(PyExc_IndexError, "Device index out of bounds");
+        return NULL;
+    }
+    //Build a dictionary with the device info
+    PyObject* info_dict = PyDict_New();
+    PyObject* value;
+
+    //dwDevType
+    value = PyLong_FromLong(diJoyInfos[device_number].dwDevType);
+    PyDict_SetItemString(info_dict, "DevType", value);
+    Py_DecRef(value);
+
+    //dwSize
+    value = PyLong_FromLong(diJoyInfos[device_number].dwSize);
+    PyDict_SetItemString(info_dict, "Size", value);
+    Py_DecRef(value);
+
+    //tszInstanceName
+    value = PyUnicode_FromWideChar(diJoyInfos[device_number].tszInstanceName, -1);
+    PyDict_SetItemString(info_dict, "InstanceName", value);
+    Py_DecRef(value);
+
+    //tszName
+    value = PyUnicode_FromWideChar(diJoyInfos[device_number].tszProductName, -1);
+    PyDict_SetItemString(info_dict, "ProductName", value);
+    Py_DecRef(value);
+
+    //wUsage
+    value = PyLong_FromLong(diJoyInfos[device_number].wUsage);
+    PyDict_SetItemString(info_dict, "Usage", value);
+    Py_DecRef(value);
+
+    //wUsagePage
+    value = PyLong_FromLong(diJoyInfos[device_number].wUsagePage);
+    PyDict_SetItemString(info_dict, "UsagePage", value);
+    Py_DecRef(value);
+
+    return info_dict;
 }
 
 PyObject* di_device_poll(PyObject *self, PyObject *args){

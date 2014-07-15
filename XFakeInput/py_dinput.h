@@ -35,9 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Python.h>
 #endif
 
-// -----------------------------------------------------------
-// --- DInput functions exported to the python interpreter ---
-// -----------------------------------------------------------
+#include "DInput_layer.h"
+
+// ----------------------------------------------------------
+// --- Variables and functions to setup the python module ---
+// ----------------------------------------------------------
 
 extern PyModuleDef DInputModule;  ///<-- DInput module struct
 extern PyMethodDef DinputMethods[]; ///<-- DInput Methods array

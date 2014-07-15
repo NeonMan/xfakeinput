@@ -30,7 +30,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace x_original{
 #include <Xinput.h>
 }
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
 
+// -----------------
+// --- Variables ---
+// -----------------
+
+extern int iJoyCount;
+extern DIDEVICEINSTANCEW diJoyInfos[];
+
+
+// -----------------
+// --- Functions ---
+// -----------------
 int dinput_init();
 
 DWORD dinput_XInputGetState(
