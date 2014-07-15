@@ -24,6 +24,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-void main(){
+// ----------------------------------------------------------------
+// --- Common macros and functions for exported python packages ---
+// ----------------------------------------------------------------
 
-}
+#ifndef __PY_COMMON_H
+#define __PY_COMMON_H
+
+#define PYTHON_METHOD_DECL(F,N,I) {N,F,METH_VARARGS,I}
+#define PYTHON_END_METHOD_DECL {NULL,NULL,0,NULL}
+
+#endif

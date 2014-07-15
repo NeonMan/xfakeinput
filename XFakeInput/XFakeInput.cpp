@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "XFakeInput.h"
 #include "DInput_layer.h"
+#include "python_layer.h"
 #include <mutex>
 
 // ---------------
@@ -38,7 +39,6 @@ bool bDirectInput_started = FALSE;
 ///Number of times fake_Init has been called
 int init_count = 0;
 ///XInput passthrough enabled/disabled
-//bool passthrough[4] = { TRUE, TRUE, TRUE, TRUE }; //
 bool passthrough[4] = { FALSE, FALSE, FALSE, FALSE };
 ///Old pad states, one for each pad
 x_original::XINPUT_STATE pad_states[4];
@@ -106,15 +106,25 @@ void fake_Init(DWORD version){
  * @brief Performs state cleanup (DLL unloaded)
  */
 void fake_Cleanup(){
-    
+    py_cleanup();
 }
 
 /**
  * @brief Initialize DirectInput.
+ * @note refactor as dinput/python initializer
  */
-void directInput_init(){
-    dinput_init();
+int directInput_init(){
     bDirectInput_started = TRUE;
+    int rv = dinput_init();
+    if ((rv < 0) || (rv == 1)){
+        for (int i = 0; i < 4; i++){ passthrough[i] = TRUE; }
+        return -1;
+    }
+    if (py_init("xfakeinput") != 0){
+        for (int i = 0; i < 4; i++){ passthrough[i] = TRUE; }
+        return -2;
+    }
+    return 0;
 }
 
 /**
@@ -160,13 +170,15 @@ DWORD fake_XInputGetState(
     DWORD rv;
     if (dwUserIndex > 3)
         return ERROR_DEVICE_NOT_CONNECTED;
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+
     if (passthrough[dwUserIndex]){
+        mutex_state.unlock();
         rv = orig_XInputGetState(dwUserIndex, pState);
         return rv;
     }
     //Not passthrough
-    mutex_state.lock();
-    if (!bDirectInput_started) directInput_init();
     //Get the new State
     *pState = pad_states[dwUserIndex];
     rv = dinput_XInputGetState(dwUserIndex, pState);
@@ -197,15 +209,21 @@ DWORD fake_XInputSetState(
     x_original::XINPUT_VIBRATION *pVibration,
     DWORD caller_version
     ){
+    DWORD rv;
     if (dwUserIndex > 3)
         return ERROR_DEVICE_NOT_CONNECTED;
-    if (passthrough[dwUserIndex])
-        return orig_XInputSetState(dwUserIndex, pVibration);
-
-    //Not passthrough
     mutex_state.lock();
     if (!bDirectInput_started) directInput_init();
-    DWORD rv = dinput_XInputSetState(dwUserIndex, pVibration);
+    mutex_state.lock();
+    if (!bDirectInput_started) directInput_init();
+    if (passthrough[dwUserIndex]){
+        rv = orig_XInputSetState(dwUserIndex, pVibration);
+        mutex_state.unlock();
+        return rv;
+    }
+
+    //Not passthrough
+    rv = dinput_XInputSetState(dwUserIndex, pVibration);
     mutex_state.unlock();
     return rv;
 }
@@ -238,15 +256,16 @@ DWORD fake_XInputGetCapabilities(
     x_original::XINPUT_CAPABILITIES *pCapabilities,
     DWORD caller_version
     ){
-    if (passthrough[dwUserIndex]){
-        DWORD rv = orig_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities);
-        return rv;
-    }
-    //Not passthrough
     if (dwUserIndex > 3)
         return ERROR_DEVICE_NOT_CONNECTED;
     mutex_state.lock();
     if (!bDirectInput_started) directInput_init();
+    if (passthrough[dwUserIndex]){
+        DWORD rv = orig_XInputGetCapabilities(dwUserIndex, dwFlags, pCapabilities);
+        mutex_state.unlock();
+        return rv;
+    }
+    //Not passthrough
     mutex_state.unlock();
     *pCapabilities = default_capabilities;
     return ERROR_SUCCESS;

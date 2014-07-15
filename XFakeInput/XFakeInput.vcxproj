@@ -41,9 +41,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);C:\Python34\DLLs;</ExecutablePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);C:\Python34\libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Python34\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);C:\Python34\DLLs;</ExecutablePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);C:\Python34\libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Python34\include;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -77,14 +83,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DInput_layer.h" />
+    <ClInclude Include="python_layer.h" />
+    <ClInclude Include="py_common.h" />
+    <ClInclude Include="py_dinput.h" />
+    <ClInclude Include="py_xfakeinput.h" />
     <ClInclude Include="XFakeInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DInput_layer.cpp" />
+    <ClCompile Include="python_layer.cpp" />
+    <ClCompile Include="py_dinput.cpp" />
+    <ClCompile Include="py_xfakeinput.cpp" />
     <ClCompile Include="XFakeInput.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="scratchpad.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

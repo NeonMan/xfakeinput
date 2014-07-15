@@ -23,7 +23,24 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef __PY_DINPUT_H
+#define __PY_DINPUT_H
+#ifndef NDEBUG
+#undef _DEBUG
+#define NDEBUG
+#include <Python.h>
+#define _DEBUG
+#undef NDEBUG
+#else
+#include <Python.h>
+#endif
 
-void main(){
+// -----------------------------------------------------------
+// --- DInput functions exported to the python interpreter ---
+// -----------------------------------------------------------
 
-}
+extern PyModuleDef DInputModule;  ///<-- DInput module struct
+extern PyMethodDef DinputMethods[]; ///<-- DInput Methods array
+PyObject* PyInit_dinput(void);
+
+#endif

@@ -79,6 +79,11 @@ const x_original::XINPUT_STATE initial_state{
     }
 };
 
+// ----------------------------
+// --- XFakeInput variables ---
+// ----------------------------
+extern bool passthrough[4];
+
 // --------------------------
 // --- XFakeInput methods ---
 // --------------------------

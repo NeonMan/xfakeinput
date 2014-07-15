@@ -68,7 +68,7 @@ void main(){
     printf("------------------------------------\r\n");
 
     //Continuously dump each pad state
-    while(1){
+    for(int i=0;i<5;i++){
         for (int i = 0; i < 4; i++){
             XINPUT_STATE s;
             DWORD hs;

@@ -124,8 +124,11 @@ int dinput_init(){
         if (FAILED(hr = lpJoysticks[i]->GetCapabilities(diJoyCaps + i))){
             return -7;
         }
-    }   
-    return 0;
+    }
+    if (iJoyCount == 0)
+        return 1;
+    else
+        return 0;
 }
 
 /**

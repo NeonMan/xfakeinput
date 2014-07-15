@@ -23,7 +23,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "python_layer.h"
+#ifndef NDEBUG
+#undef _DEBUG
+#define NDEBUG
+#include <Python.h>
+#define _DEBUG
+#undef NDEBUG
+#else
+#include <Python.h>
+#endif
+#include "py_dinput.h"
+#include "py_xfakeinput.h"
 
-void main(){
+int py_init(char* module){
+    PyObject *pName, *pModule;
 
+    PyImport_AppendInittab("dinput", &PyInit_dinput);
+    PyImport_AppendInittab("xfi", &PyInit_xfi);
+    Py_Initialize();
+    PySys_SetPath(L"");
+    pName = PyUnicode_FromString(module);
+    /* Error checking of pName left out */
+    pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", module);
+        return 1;
+    }
+    return 0;
+}
+
+void py_cleanup(){
+    Py_Finalize();
 }

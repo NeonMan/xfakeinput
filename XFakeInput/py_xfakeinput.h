@@ -23,7 +23,26 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef __PY_XFAKEINPUT_H
+#define __PY_XFAKEINPUT_H
 
-void main(){
+#ifndef NDEBUG
+#undef _DEBUG
+#define NDEBUG
+#include <Python.h>
+#define _DEBUG
+#undef NDEBUG
+#else
+#include <Python.h>
+#endif
 
-}
+#include "XFakeInput.h"
+
+// ---------------------------------------------------------------
+// --- XFakeInput functions exported to the python interpreter ---
+// ---------------------------------------------------------------
+
+extern PyModuleDef XFIModule;  ///<-- module struct
+extern PyMethodDef XFIMethods[]; ///<-- Methods array
+PyObject* PyInit_xfi(void);
+#endif
