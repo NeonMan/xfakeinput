@@ -39,7 +39,7 @@ namespace x_original{
 
 extern int iJoyCount;
 extern DIDEVICEINSTANCEW diJoyInfos[];
-
+extern LPDIRECTINPUTDEVICE8 lpJoysticks[];
 
 // -----------------
 // --- Functions ---

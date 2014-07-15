@@ -50,6 +50,10 @@ print("DInput devices:", dinput.num_devices())
 print("Device #0 info:")
 print(dinput.device_info(0))
 
+#Dump the joystate2 from the first device
+dinput.device_poll(0)
+print(dinput.get_joystate2(0))
+
 def get_state():
   '''Return the pad state'''
   return sample_state
