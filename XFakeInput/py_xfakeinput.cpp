@@ -29,11 +29,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //Forward declaration of exported functions
 PyObject* xfi_get_passthrough(PyObject *self, PyObject *args);
 PyObject* xfi_set_passthrough(PyObject *self, PyObject *args);
+PyObject* xfi_long_to_axis(PyObject *self, PyObject *args);
 
 //Definition of Module methods
 PyMethodDef XFIMethods[] = {
     PYTHON_METHOD_DECL(xfi_get_passthrough, "get_passthrough", "Returns the passthrough state"),
     PYTHON_METHOD_DECL(xfi_set_passthrough, "set_passthrough", "Sets the passthrough state"),
+    PYTHON_METHOD_DECL(xfi_long_to_axis, "long_to_axis", "converts DInput long integer to XInput short integer"),
     PYTHON_END_METHOD_DECL
 };
 
@@ -87,6 +89,24 @@ PyObject* xfi_set_passthrough(PyObject *self, PyObject *args){
 
     //Return success
     Py_RETURN_NONE;
+}
+
+/**
+* @brief Converts axis values from DInput ranges to XInput ranges.
+*/
+PyObject* xfi_long_to_axis(PyObject *self, PyObject *args){
+    PyObject* f_param = 0;
+    //Function has only one parameter
+    if (!PyArg_UnpackTuple(args, "passthrough", 1, 1, &f_param))
+        return NULL;
+    //It is a Long
+    if (!PyLong_Check(f_param)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be a long integer");
+        return NULL;
+    }
+    LONG v = PyLong_AsLong(f_param);
+    LONG shortened_axis = (v & 0x0000FFFF) - 32768;
+    return PyLong_FromLong(((SHORT)shortened_axis) == -32768 ? -32767 : ((SHORT)shortened_axis));
 }
 
 /**

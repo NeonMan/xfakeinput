@@ -175,6 +175,8 @@ inline WORD  convert_POV(DWORD pov){
  * @brief Translate a directInput device to XInput struct
  * @fixme Hardcoded to my current gamepad.
  */
+
+/*
 DWORD dinput_XInputGetState(
     DWORD dwUserIndex,
     x_original::XINPUT_STATE *pState_new
@@ -212,3 +214,4 @@ DWORD dinput_XInputGetState(
     pState_new->Gamepad.wButtons |= convert_POV(joy_stat.rgdwPOV[0]);
     return ERROR_SUCCESS;
 }
+*/
