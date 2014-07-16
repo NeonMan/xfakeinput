@@ -6,8 +6,6 @@
 # pad connected and set up as pad number 1,3 or 4. It will be available too
 #
 
-
-
 #Here we import packages we will need
 import xfi     #<-- xfi gives access to XFakeInput
 import dinput  #<-- dinput gives access to DirectInput
@@ -116,6 +114,10 @@ def make_state(jstat):
    rv['TriggerR'] = 255
   else:
    rv['TriggerR'] = 0
+   
+  #D-Pad
+  # Unimplemented, should iterpret the first POV
+  
   #Return the dictionary with the new state.
   return rv
   

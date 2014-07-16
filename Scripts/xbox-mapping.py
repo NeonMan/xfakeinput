@@ -63,8 +63,6 @@ xfi.set_passthrough( (False, True, True, True) )
 print("Pad instance '%s' maps to device #%d" % (instance_name, dev_id))
 
 #This function converts a DirectInput state to a XInput state.
-#The mapping is the same from simple-mapping, so the buttons 
-#and some axis will be missconfigured
 def make_state(jstat):
   rv = {}
   #Analog sticks
@@ -74,50 +72,52 @@ def make_state(jstat):
   rv['ThumbLX'] = xfi.long_to_axis(jstat['X'])
   #Left thumb Y --> Y-Axis
   rv['ThumbLY'] = -xfi.long_to_axis(jstat['Y'])
-  #Right thumb X --> Z-Axis
-  rv['ThumbRX'] = xfi.long_to_axis(jstat['Z'])
+  #Right thumb X --> X-Rotation
+  rv['ThumbRX'] = xfi.long_to_axis(jstat['Rx'])
   #Right thumb Y --> Y-Rotation
   #DirectInput assigns the names, not my fault.
-  rv['ThumbRY'] = -xfi.long_to_axis(jstat['Rz'])
+  rv['ThumbRY'] = -xfi.long_to_axis(jstat['Ry'])
   
   #Buttons
   #Button mapping is pretty straightforward
-  #A --> Button 1
-  rv['ButtonA'] = jstat['Buttons'][1]
-  #B --> Button 2
-  rv['ButtonB'] = jstat['Buttons'][2]
-  #X --> Button 0
-  rv['ButtonX'] = jstat['Buttons'][0]
+  #A --> Button 0
+  rv['ButtonA'] = jstat['Buttons'][0]
+  #B --> Button 1
+  rv['ButtonB'] = jstat['Buttons'][1]
+  #X --> Button 2
+  rv['ButtonX'] = jstat['Buttons'][2]
   #Y --> Button 3
   rv['ButtonY'] = jstat['Buttons'][3]
-  #BACK --> Button 8
-  rv['ButtonBack'] = jstat['Buttons'][8]
-  #START --> Button 9
-  rv['ButtonStart'] = jstat['Buttons'][9]
+  #BACK --> Button 6
+  rv['ButtonBack'] = jstat['Buttons'][6]
+  #START --> Button 7
+  rv['ButtonStart'] = jstat['Buttons'][7]
   #Left shoulder --> Button 4
   rv['ButtonLShoulder'] = jstat['Buttons'][4]
   #Right shoulder --> Button 5
   rv['ButtonRShoulder'] = jstat['Buttons'][5]
-  #Left thumb button --> Button 10
-  rv['ButtonLThumb'] = jstat['Buttons'][10]
-  #Right thumb button --> Button 11
-  rv['ButtonRThumb'] = jstat['Buttons'][11]
+  #Left thumb button --> Button 8
+  rv['ButtonLThumb'] = jstat['Buttons'][8]
+  #Right thumb button --> Button 9
+  rv['ButtonRThumb'] = jstat['Buttons'][9]
   
   #Triggers
-  #Triggers have a value range, [0 255]. Here we are mapping a trigger to
-  #a button, so if the button is pressed, the trigger is full-down, else
-  #the trigger is at rest.
-  #Left trigger --> Button 6
-  if jstat['Buttons'][6]:
+  #When reading the triggers using DirectInput, they are treated as the
+  #same axis (Z-Axis). Left trigger pulls it down and Right pulls it up
+  trigger_axis = jstat['Z']
+  if trigger_axis > 60000:
    rv['TriggerL'] = 255
   else:
-   rv['TriggerL'] = 0
-  #Right trigger --> Button 7
-  if jstat['Buttons'][7]:
+   rv['TriggerL'] = 0;
+  if trigger_axis < -1000:
    rv['TriggerR'] = 255
   else:
-   rv['TriggerR'] = 0
+   rv['TriggerR'] = 0;
   #Return the dictionary with the new state.
+  
+  #D-Pad
+  # Unimplemented, must interpret the first POV.
+  
   return rv
   
 #Each time the game requests the pad state, this function will be called and
