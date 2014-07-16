@@ -2,7 +2,8 @@
 # simple-mapping.py
 #
 # This script shows how to make a simple pad mapping where a DirectInput
-# gamepad will be used to emulate one of the XInput pads.
+# gamepad will be used to emulate the second gamepad. If there is an XBOX
+# pad connected and set up as pad number 1,3 or 4. It will be available too
 #
 
 
