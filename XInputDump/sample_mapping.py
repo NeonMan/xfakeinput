@@ -60,9 +60,8 @@ def make_state(jstat):
   if jstat['Buttons'][7]:
    rv['TriggerR'] = 255
   else:
-   rv['TriggerR'] = 0
-   
-   return rv
+   rv['TriggerR'] = 0 
+  return rv
   
 
 def get_state(dwUserIndex):
