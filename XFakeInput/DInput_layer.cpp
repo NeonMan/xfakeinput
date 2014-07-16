@@ -212,16 +212,3 @@ DWORD dinput_XInputGetState(
     pState_new->Gamepad.wButtons |= convert_POV(joy_stat.rgdwPOV[0]);
     return ERROR_SUCCESS;
 }
-
-/**
- * @brief Accept data from XInput (does nothing right now...)
- */
-DWORD dinput_XInputSetState(
-    DWORD dwUserIndex,
-    x_original::XINPUT_VIBRATION *pVibration
-    ){
-    if (dwUserIndex != 0)
-        return ERROR_DEVICE_NOT_CONNECTED;
-    else
-        return ERROR_SUCCESS;
-}

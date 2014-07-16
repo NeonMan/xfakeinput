@@ -68,11 +68,12 @@ print(iname, "devices:", dinput.devices_by_name(iname))
 iname = "Not a chance"
 print(iname, "devices:", dinput.devices_by_name(iname))
 
-def get_state():
+def get_state(dwUserIndex):
   '''Return the pad state'''
+  print("Requesting state for pad number:", dwUserIndex)
   return sample_state
 
-def set_state(state):
+def set_state(dwUserIndex, state):
   '''Receive state from the game'''
   pass
   

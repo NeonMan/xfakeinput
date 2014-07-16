@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "python_layer.h"
 #include <mutex>
 
+#include "py_xfakeinput.h"
+
 // ---------------
 // --- Globals ---
 // ---------------
@@ -181,7 +183,10 @@ DWORD fake_XInputGetState(
     //Not passthrough
     //Get the new State
     *pState = pad_states[dwUserIndex];
-    rv = dinput_XInputGetState(dwUserIndex, pState);
+
+    //Retrieve the state from python script
+    rv = py_GetState(dwUserIndex, pState);
+    
     if (rv == ERROR_SUCCESS){
         //Check if old state is different from the new one.
         //If so, increment packet ID and replace the old state with the new one.
@@ -223,9 +228,8 @@ DWORD fake_XInputSetState(
     }
 
     //Not passthrough
-    rv = dinput_XInputSetState(dwUserIndex, pVibration);
     mutex_state.unlock();
-    return rv;
+    return ERROR_SUCCESS;
 }
 
 /**

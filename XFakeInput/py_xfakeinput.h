@@ -46,4 +46,11 @@ extern PyModuleDef XFIModule;  ///<-- module struct
 extern PyMethodDef XFIMethods[]; ///<-- Methods array
 PyObject* PyInit_xfi(void);
 
+// -----------------------------------
+// --- Callers to python functions ---
+// -----------------------------------
+
+DWORD py_GetState(DWORD dwUserIndex, x_original::XINPUT_STATE *pState_new);
+DWORD py_SetState(DWORD dwUserIndex, x_original::XINPUT_VIBRATION *pVibration);
+
 #endif
