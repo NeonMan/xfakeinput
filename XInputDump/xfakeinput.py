@@ -51,8 +51,22 @@ print("Device #0 info:")
 print(dinput.device_info(0))
 
 #Dump the joystate2 from the first device
-dinput.device_poll(0)
+dinput.poll(0)
 print(dinput.get_joystate2(0))
+
+#Search for a device with instance name 'AUTO PAD'
+iname = "AUTO PAD"
+print("instance name", iname, "is device number:", dinput.device_by_instance(iname))
+
+#Search for a device with instance name 'nonexistant'
+iname = "Nonexistant"
+print("instance name", iname, "is device number:", dinput.device_by_instance(iname))
+
+#Enumerate the devices with a given name
+iname = "AUTO PAD"
+print(iname, "devices:", dinput.devices_by_name(iname))
+iname = "Not a chance"
+print(iname, "devices:", dinput.devices_by_name(iname))
 
 def get_state():
   '''Return the pad state'''

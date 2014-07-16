@@ -31,13 +31,17 @@ PyObject* di_num_devices(PyObject *self, PyObject *args);
 PyObject* di_device_info(PyObject *self, PyObject *args);
 PyObject* di_device_poll(PyObject *self, PyObject *args);
 PyObject* di_get_joystate2(PyObject *self, PyObject *args);
+PyObject* di_devices_by_name(PyObject *self, PyObject *args);
+PyObject* di_device_by_instance(PyObject *self, PyObject *args);
 
 //Definition of Module methods
 PyMethodDef DInputMethods[] =  {
     PYTHON_METHOD_DECL(di_num_devices, "num_devices", "Number of Detected DirectInput devices"),
     PYTHON_METHOD_DECL(di_device_info, "device_info", "Information regarding the selected device"),
-    PYTHON_METHOD_DECL(di_device_poll, "device_poll", "Poll the device"),
+    PYTHON_METHOD_DECL(di_device_poll, "poll", "Poll the device"),
     PYTHON_METHOD_DECL(di_get_joystate2, "get_joystate2", "Obtain the device state (DIJOYSTATE2)"),
+    PYTHON_METHOD_DECL(di_devices_by_name, "devices_by_name", "Obtain all the device numbers matching the name"),
+    PYTHON_METHOD_DECL(di_device_by_instance, "device_by_instance", "Obtain the device number of a given instance name"),
     PYTHON_END_METHOD_DECL
 };
 
@@ -119,6 +123,62 @@ PyObject* di_device_info(PyObject *self, PyObject *args){
     Py_DecRef(value);
 
     return info_dict;
+}
+
+/**
+ * @brief Provide the device numbers for a given product name.
+ */
+PyObject* di_devices_by_name(PyObject *self, PyObject *args){
+    PyObject* po_str;
+    if (!PyArg_UnpackTuple(args, "dev_by_instance", 1, 1, &po_str)){
+        return NULL;
+    }
+    //Cast parameter to a string
+    wchar_t device_name[261];
+    memset(device_name, 0, sizeof(wchar_t)* 261);
+    PyUnicode_AsWideChar(po_str, device_name, 260);
+
+    //Search for the devices
+    int found_count = 0;
+    int* dev_ids = new int[iJoyCount];
+    for (int i = 0; i < iJoyCount; i++){
+        if (wcscmp(device_name, diJoyInfos[i].tszProductName) == 0){
+            dev_ids[found_count] = i;
+            ++found_count;
+        }
+    }
+
+    //Build the tuple
+    PyObject* id_tuple = PyTuple_New(found_count);
+    for (int i = 0; i < found_count; i++){
+        PyTuple_SetItem(id_tuple, i, PyLong_FromLong(dev_ids[i]));
+    }
+    delete(dev_ids);
+    return id_tuple;
+}
+
+/**
+ * @brief Provide the device number for a given instance name.
+ */
+PyObject* di_device_by_instance(PyObject *self, PyObject *args){
+    PyObject* po_str;
+    if (!PyArg_UnpackTuple(args, "dev_by_instance", 1, 1, &po_str)){
+        return NULL;
+    }
+    //Cast parameter to a string
+    wchar_t instance_name[261];
+    memset(instance_name, 0, sizeof(wchar_t)* 261);
+    PyUnicode_AsWideChar(po_str, instance_name, 260);
+
+    //Search for the device
+    for (int i = 0; i < iJoyCount; i++){
+        if (wcscmp(diJoyInfos[i].tszInstanceName, instance_name) == 0){
+            //Device found
+            return PyLong_FromLong(i);
+        }
+    }
+    //Device not found
+    Py_RETURN_NONE;
 }
 
 /**
