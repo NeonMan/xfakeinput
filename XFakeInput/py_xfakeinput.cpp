@@ -138,6 +138,11 @@ DWORD py_GetState(DWORD dwUserIndex, x_original::XINPUT_STATE *pState_new){
     //Make the call
     PyObject* py_return = PyObject_CallObject(function, pArgs);
 
+	//If the call failed
+	if (py_return == NULL){
+		return ERROR_DEVICE_NOT_CONNECTED;
+	}
+
     //Must be a dictionary
     if (!PyDict_Check(py_return)){
         return ERROR_DEVICE_NOT_CONNECTED;
