@@ -5,6 +5,8 @@ import dinput
 #sys module is built into python
 import sys
 
+import sample_mapping
+
 #Redirect the standard output/error
 #If an error happens, it will be logged to text files
 sys.stderr = open("stderr.log", "w")
@@ -70,8 +72,7 @@ print(iname, "devices:", dinput.devices_by_name(iname))
 
 def get_state(dwUserIndex):
   '''Return the pad state'''
-  print("Requesting state for pad number:", dwUserIndex)
-  return sample_state
+  return sample_mapping.get_state(dwUserIndex)
 
 def set_state(dwUserIndex, state):
   '''Receive state from the game'''

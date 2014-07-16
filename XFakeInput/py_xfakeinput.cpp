@@ -173,59 +173,59 @@ DWORD py_GetState(DWORD dwUserIndex, x_original::XINPUT_STATE *pState_new){
     // -- A
     value = PyDict_GetItemString(py_return, "ButtonA"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_A;
+        if (PyObject_IsTrue(value)) pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_A;
     // -- B
     value = PyDict_GetItemString(py_return, "ButtonB"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_B;
+        if(PyObject_IsTrue(value)) pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_B;
     // -- X
     value = PyDict_GetItemString(py_return, "ButtonX"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_X;
+        if (PyObject_IsTrue(value)) pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_X;
     // -- Y
     value = PyDict_GetItemString(py_return, "ButtonY"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_Y;
+        if (PyObject_IsTrue(value)) pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_Y;
     // -- Start
     value = PyDict_GetItemString(py_return, "ButtonStart"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_START;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_START;
     // -- Back
     value = PyDict_GetItemString(py_return, "ButtonBack"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_BACK;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_BACK;
     // -- Up
     value = PyDict_GetItemString(py_return, "ButtonU"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_UP;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_UP;
     // -- Down
     value = PyDict_GetItemString(py_return, "ButtonD"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_DOWN;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_DOWN;
     // -- Left
     value = PyDict_GetItemString(py_return, "ButtonL"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_LEFT;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_LEFT;
     // -- Right
     value = PyDict_GetItemString(py_return, "ButtonR"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_RIGHT;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_DPAD_RIGHT;
     // -- LThumb
     value = PyDict_GetItemString(py_return, "ButtonLThumb"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_THUMB;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_THUMB;
     // -- RThumb
     value = PyDict_GetItemString(py_return, "ButtonRThumb"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_THUMB;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_THUMB;
     // -- LShoulder
     value = PyDict_GetItemString(py_return, "ButtonLShoulder"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_SHOULDER;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_LEFT_SHOULDER;
     // -- RShoulder
     value = PyDict_GetItemString(py_return, "ButtonRShoulder"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_SHOULDER;
+        if (PyObject_IsTrue(value))pState_new->Gamepad.wButtons |= XINPUT_GAMEPAD_RIGHT_SHOULDER;
 
     Py_DecRef(py_return);
     return ERROR_SUCCESS;

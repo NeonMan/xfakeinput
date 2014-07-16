@@ -317,17 +317,17 @@ PyObject* di_get_joystate2(PyObject *self, PyObject *args){
     Py_DecRef(value);
 
     //RotationX
-    value = PyLong_FromLong(state.lFRx);
+    value = PyLong_FromLong(state.lRx);
     PyDict_SetItemString(dict_state, "Rx", value);
     Py_DecRef(value);
 
     //RotationY
-    value = PyLong_FromLong(state.lFRy);
+    value = PyLong_FromLong(state.lRy);
     PyDict_SetItemString(dict_state, "Ry", value);
     Py_DecRef(value);
 
     //RotationZ
-    value = PyLong_FromLong(state.lFRz);
+    value = PyLong_FromLong(state.lRz);
     PyDict_SetItemString(dict_state, "Rz", value);
     Py_DecRef(value);
 
