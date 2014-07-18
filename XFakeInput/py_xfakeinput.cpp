@@ -30,12 +30,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 PyObject* xfi_get_passthrough(PyObject *self, PyObject *args);
 PyObject* xfi_set_passthrough(PyObject *self, PyObject *args);
 PyObject* xfi_long_to_axis(PyObject *self, PyObject *args);
+PyObject* xfi_pov_to_dpad(PyObject* self, PyObject* args);
 
 //Definition of Module methods
 PyMethodDef XFIMethods[] = {
     PYTHON_METHOD_DECL(xfi_get_passthrough, "get_passthrough", "Returns the passthrough state"),
     PYTHON_METHOD_DECL(xfi_set_passthrough, "set_passthrough", "Sets the passthrough state"),
-    PYTHON_METHOD_DECL(xfi_long_to_axis, "long_to_axis", "converts DInput long integer to XInput short integer"),
+    PYTHON_METHOD_DECL(xfi_long_to_axis, "long_to_axis", "Converts DInput long integer to XInput short integer"),
+    PYTHON_METHOD_DECL(xfi_pov_to_dpad, "pov_to_dpad", "Converts a POV angle to D-Pad buttons"),
     PYTHON_END_METHOD_DECL
 };
 
@@ -107,6 +109,68 @@ PyObject* xfi_long_to_axis(PyObject *self, PyObject *args){
     LONG v = PyLong_AsLong(f_param);
     LONG shortened_axis = (v & 0x0000FFFF) - 32768;
     return PyLong_FromLong(((SHORT)shortened_axis) == -32768 ? -32767 : ((SHORT)shortened_axis));
+}
+
+/**
+ * @brief Converts a POV angle to D-Pad buttons.
+ *
+ * The returned value is a 4-element boolean tuple (Up, Down, Left, Right).
+ */
+PyObject* xfi_pov_to_dpad(PyObject* self, PyObject* args){
+    PyObject* f_param = 0;
+    //Function has only one parameter
+    if (!PyArg_UnpackTuple(args, "pov_to_dpad", 1, 1, &f_param))
+        return NULL;
+    //It is a Long
+    if (!PyLong_Check(f_param)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be a long integer");
+        return NULL;
+    }
+    LONG pov = PyLong_AsLong(f_param);
+    int dpad[] = { FALSE, FALSE, FALSE, FALSE };
+
+    if (pov < 0){
+        //Do nothing
+    }
+    else if (pov <= 3000){
+        dpad[0] = TRUE; //UP
+    }
+    else if (pov <= 6000){
+        dpad[0] = TRUE; //UP
+        dpad[3] = TRUE; //RIGHT
+    }
+    else if (pov <= 12000){
+        dpad[3] = TRUE; //RIGHT
+    }
+    else if (pov <= 15000){
+        dpad[1] = TRUE; //DOWN
+        dpad[3] = TRUE; //RIGHT
+    }
+    else if (pov <= 21000){
+        dpad[1] = TRUE; //DOWN
+    }
+    else if (pov <= 24000){
+        dpad[1] = TRUE; //DOWN
+        dpad[2] = TRUE; //LEFT
+    }
+    else if (pov <= 30000){
+        dpad[2] = TRUE; //LEFT
+    }
+    else if (pov <= 33000){
+        dpad[0] = TRUE; //UP
+        dpad[2] = TRUE; //LEFT
+    }
+    else if (pov <= 35900){
+        dpad[0] = TRUE; //UP
+    }
+
+    //Prepare the tuple
+    PyObject* rv = PyTuple_New(4);
+    for (int i = 0; i < 4; i++){
+        PyObject* b = PyBool_FromLong(dpad[i]);
+        PyTuple_SetItem(rv, i, b);
+    }
+    return rv;
 }
 
 /**

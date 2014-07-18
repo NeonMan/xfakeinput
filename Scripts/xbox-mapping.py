@@ -116,7 +116,19 @@ def make_state(jstat):
   #Return the dictionary with the new state.
   
   #D-Pad
-  # Unimplemented, must interpret the first POV.
+  #The D-pad state is usually read as a POV angle. For this reason
+  #the xfi module provides the pov_to_dpad which converts an angle
+  #to a 4-element boolean tuple (Up, Down, Left, Right)
+  dpad = xfi.pov_to_dpad(jstat['POV'][0])
+  if dpad[0]:
+   rv['ButtonU'] = True
+  if dpad[1]:
+   rv['ButtonD'] = True
+  if dpad[2]:
+   rv['ButtonL'] = True
+  if dpad[3]:
+   rv['ButtonR'] = True
+  
   
   return rv
   

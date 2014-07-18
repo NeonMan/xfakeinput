@@ -381,9 +381,17 @@ PyObject* di_get_joystate2(PyObject *self, PyObject *args){
     for (int i = 0; i < 128; i++){
         PyObject* button = PyBool_FromLong(state.rgbButtons[i]);
         PyTuple_SetItem(value, i, button);
-        //Py_DecRef(button); //<-- not needed, setItem 'steals' a reference
     }
     PyDict_SetItemString(dict_state, "Buttons", value);
+    Py_DecRef(value);
+
+    //POV array
+    value = PyTuple_New(4);
+    for (int i = 0; i < 4; i++){
+        PyObject* pov = PyLong_FromLong(state.rgdwPOV[i]);
+        PyTuple_SetItem(value, i, pov);
+    }
+    PyDict_SetItemString(dict_state, "POV", value);
     Py_DecRef(value);
 
     ///@note Add aditional axis/accelerations/velocities/forces if requested.

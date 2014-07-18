@@ -116,7 +116,15 @@ def make_state(jstat):
    rv['TriggerR'] = 0
    
   #D-Pad
-  # Unimplemented, should iterpret the first POV
+  dpad = xfi.pov_to_dpad(jstat['POV'][0])
+  if dpad[0]:
+   rv['ButtonU'] = True
+  if dpad[1]:
+   rv['ButtonD'] = True
+  if dpad[2]:
+   rv['ButtonL'] = True
+  if dpad[3]:
+   rv['ButtonR'] = True
   
   #Return the dictionary with the new state.
   return rv
