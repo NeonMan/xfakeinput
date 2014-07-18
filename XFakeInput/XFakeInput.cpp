@@ -118,7 +118,7 @@ void fake_Cleanup(){
 int directInput_init(){
     bDirectInput_started = TRUE;
     int rv = dinput_init();
-    if ((rv < 0) || (rv == 1)){
+    if ((rv < 0)){
         for (int i = 0; i < 4; i++){ passthrough[i] = TRUE; }
         return -1;
     }

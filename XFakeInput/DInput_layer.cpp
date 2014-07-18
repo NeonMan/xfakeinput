@@ -84,7 +84,7 @@ int dinput_init(){
     }
 
     // Enumerate all dInput devices
-    if (FAILED(hr = di->EnumDevices(DI8DEVCLASS_GAMECTRL, enumCallback,
+    if (FAILED(hr = di->EnumDevices(DI8DEVCLASS_ALL, enumCallback,
         NULL, DIEDFL_ATTACHEDONLY))) {
         return -2;
     }
@@ -126,10 +126,7 @@ int dinput_init(){
             return -7;
         }
     }
-    if (iJoyCount == 0)
-        return 1;
-    else
-        return 0;
+    return iJoyCount;
 }
 
 /**
