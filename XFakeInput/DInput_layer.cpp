@@ -89,11 +89,33 @@ int dinput_init(){
         return -2;
     }
 
-    //Why not a single for loop? Readability, maybe...
+    //Extract info
+    for (int i = 0; i < iJoyCount; i++){
+        diJoyInfos[i].dwSize = sizeof(DIDEVICEINSTANCEW);
+        if (FAILED(hr = lpJoysticks[i]->GetDeviceInfo(diJoyInfos + i))){
+            return -6;
+        }
+    }
+
     //Configure (set data format)
     for (int i = 0; i < iJoyCount; i++){
-        if ( FAILED(hr = lpJoysticks[i]->SetDataFormat(&c_dfDIJoystick2)) ){
-            return -3;
+        if ((diJoyInfos[i].dwDevType & 0x00FF) == DI8DEVTYPE_KEYBOARD){
+            //Configure as keyboard
+            if (FAILED(hr = lpJoysticks[i]->SetDataFormat(&c_dfDIKeyboard))){
+                return -3;
+            }
+        }
+        else if ((diJoyInfos[i].dwDevType & 0x00FF) == DI8DEVTYPE_MOUSE){
+            //Configure as mouse
+            if (FAILED(hr = lpJoysticks[i]->SetDataFormat(&c_dfDIMouse2))){
+                return -3;
+            }
+        }
+        else{
+            //Otherwise, configure like a game device (joystick)
+            if (FAILED(hr = lpJoysticks[i]->SetDataFormat(&c_dfDIJoystick2))){
+                return -3;
+            }
         }
     }
 
@@ -111,14 +133,6 @@ int dinput_init(){
         }
     }
 
-    //Extract info
-    for (int i = 0; i < iJoyCount; i++){
-        diJoyInfos[i].dwSize = sizeof(DIDEVICEINSTANCEW);
-        if (FAILED(hr = lpJoysticks[i]->GetDeviceInfo(diJoyInfos + i))){
-            return -6;
-        }
-    }
-
     //Extract capabilities
     for (int i = 0; i < iJoyCount; i++){
         diJoyCaps[i].dwSize = sizeof(DIDEVCAPS);
@@ -127,44 +141,4 @@ int dinput_init(){
         }
     }
     return iJoyCount;
-}
-
-/**
- * @brief Converts axis values from DInput ranges to XInput ranges.
- * 
- * @param v DirectInput axis value [0,65535]
- * @return XInput axis value [–32768,32767]
- */
-inline SHORT convert_axis(LONG v){
-    LONG shortened_axis = (v & 0x0000FFFF) - 32768;
-    return ((SHORT)shortened_axis) == -32768 ? -32767 : ((SHORT)shortened_axis);
-}
-
-/**
- * @brief Converts a POV value to XInput DPAD
- *
- * @param pov a DInput POV value
- * @return A button mask
- */
-inline WORD  convert_POV(DWORD pov){
-    if (pov <= 3000)
-        return XINPUT_GAMEPAD_DPAD_UP;
-    else if (pov <= 6000)
-        return XINPUT_GAMEPAD_DPAD_UP | XINPUT_GAMEPAD_DPAD_RIGHT;
-    else if (pov <= 12000)
-        return XINPUT_GAMEPAD_DPAD_RIGHT;
-    else if (pov <= 15000)
-        return XINPUT_GAMEPAD_DPAD_RIGHT | XINPUT_GAMEPAD_DPAD_DOWN;
-    else if (pov <= 21000)
-        return XINPUT_GAMEPAD_DPAD_DOWN;
-    else if (pov <= 24000)
-        return XINPUT_GAMEPAD_DPAD_DOWN | XINPUT_GAMEPAD_DPAD_LEFT;
-    else if (pov <= 30000)
-        return XINPUT_GAMEPAD_DPAD_LEFT;
-    else if (pov <= 33000)
-        return XINPUT_GAMEPAD_DPAD_LEFT | XINPUT_GAMEPAD_DPAD_UP;
-    else if (pov <= 35900)
-        return XINPUT_GAMEPAD_DPAD_UP;
-    else
-        return 0;
 }

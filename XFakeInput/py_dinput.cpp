@@ -33,6 +33,9 @@ PyObject* di_device_poll(PyObject *self, PyObject *args);
 PyObject* di_get_joystate2(PyObject *self, PyObject *args);
 PyObject* di_devices_by_name(PyObject *self, PyObject *args);
 PyObject* di_device_by_instance(PyObject *self, PyObject *args);
+PyObject* di_get_mouse2(PyObject *self, PyObject *args);
+PyObject* di_get_keyboard(PyObject *self, PyObject *args);
+PyObject* di_get_state(PyObject *self, PyObject *args);
 
 //Definition of Module methods
 PyMethodDef DInputMethods[] =  {
@@ -42,6 +45,9 @@ PyMethodDef DInputMethods[] =  {
     PYTHON_METHOD_DECL(di_get_joystate2, "get_joystate2", "Obtain the device state (DIJOYSTATE2)"),
     PYTHON_METHOD_DECL(di_devices_by_name, "devices_by_name", "Obtain all the device numbers matching the name"),
     PYTHON_METHOD_DECL(di_device_by_instance, "device_by_instance", "Obtain the device number of a given instance name"),
+    PYTHON_METHOD_DECL(di_get_mouse2, "get_mouse2", "Obtain the device state (DIMOUSE2)"),
+    PYTHON_METHOD_DECL(di_get_keyboard, "get_keyboard", "Obtain the device state (DirectInput keyboard)"),
+    PYTHON_METHOD_DECL(di_get_state, "get_state", "Obtain the device state"),
     PYTHON_END_METHOD_DECL
 };
 
@@ -202,6 +208,34 @@ PyObject* di_device_poll(PyObject *self, PyObject *args){
         return NULL;
     }
     return PyLong_FromLong(lpJoysticks[device_number]->Poll());
+}
+
+/**
+ * @brief provide a state, selecting the correct device type.
+ */
+PyObject* di_get_state(PyObject *self, PyObject *args){
+    PyObject* po_number;
+    //Function has only one parameter (integer)
+    if (!PyArg_UnpackTuple(args, "device_number", 1, 1, &po_number))
+        return NULL;
+    //Check if it is an integer
+    if (!PyLong_Check(po_number)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be an integer");
+        return NULL;
+    }
+    //Extract the value
+    long device_number = PyLong_AsLong(po_number);
+    //Device number in range?
+    if ((device_number >= iJoyCount) || (device_number < 0)){
+        PyErr_SetString(PyExc_IndexError, "Device index out of bounds");
+        return NULL;
+    }
+    if ((diJoyInfos[device_number].dwDevType & 0x00FF) == DI8DEVTYPE_KEYBOARD)
+        return di_get_keyboard(self, args);
+    else if ((diJoyInfos[device_number].dwDevType & 0x00FF) == DI8DEVTYPE_MOUSE)
+        return di_get_mouse2(self, args);
+    else
+        return di_get_joystate2(self, args);
 }
 
 /**
@@ -397,4 +431,138 @@ PyObject* di_get_joystate2(PyObject *self, PyObject *args){
     ///@note Add aditional axis/accelerations/velocities/forces if requested.
     
     return dict_state;
+}
+
+
+/**
+* @brief provide a dictionary with the keyboard state
+*/
+PyObject* di_get_mouse2(PyObject *self, PyObject *args){
+    PyObject* po_number;
+    //Function has only one parameter (integer)
+    if (!PyArg_UnpackTuple(args, "device_number", 1, 1, &po_number))
+        return NULL;
+    //Check if it is an integer
+    if (!PyLong_Check(po_number)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be an integer");
+        return NULL;
+    }
+    //Extract the value
+    long device_number = PyLong_AsLong(po_number);
+    //Device number in range?
+    if ((device_number >= iJoyCount) || (device_number < 0)){
+        PyErr_SetString(PyExc_IndexError, "Device index out of bounds");
+        return NULL;
+    }
+
+    //Get device state
+    DIMOUSESTATE2 state;
+    HRESULT rv;
+    rv = lpJoysticks[device_number]->GetDeviceState(sizeof(DIMOUSESTATE2), &state);
+    if (rv != DI_OK){
+        switch (rv){
+        case DIERR_INPUTLOST:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Input lost");
+            return NULL;
+        case DIERR_INVALIDPARAM:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Invalid param");
+            return NULL;
+        case DIERR_NOTACQUIRED:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Not acquired");
+            return NULL;
+        case DIERR_NOTINITIALIZED:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Not initialized");
+            return NULL;
+        case E_PENDING:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Pending");
+            return NULL;
+        default:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Unknown");
+            return NULL;
+        }
+    }
+
+    //Make the dictionary
+    PyObject* return_dict = PyDict_New();
+    PyObject* value;
+
+    //X-axis
+    value = PyLong_FromLong(state.lX);
+    PyDict_SetItemString(return_dict, "X", value);
+    Py_DecRef(value);
+
+    //Y-axis
+    value = PyLong_FromLong(state.lY);
+    PyDict_SetItemString(return_dict, "Y", value);
+    Py_DecRef(value);
+
+    //Z-axis
+    value = PyLong_FromLong(state.lZ);
+    PyDict_SetItemString(return_dict, "Z", value);
+    Py_DecRef(value);
+
+    //Buttons (8)
+    value = PyTuple_New(8);
+    for (int i = 0; i < 8; i++){
+        PyTuple_SetItem(value, i, PyBool_FromLong(state.rgbButtons[i]));
+    }
+    PyDict_SetItemString(return_dict, "Buttons", value);
+    Py_DecRef(value);
+
+    return return_dict;
+}
+
+
+/**
+ * @brief provide a dictionary with the keyboard state
+ */
+PyObject* di_get_keyboard(PyObject *self, PyObject *args){
+    PyObject* po_number;
+    //Function has only one parameter (integer)
+    if (!PyArg_UnpackTuple(args, "device_number", 1, 1, &po_number))
+        return NULL;
+    //Check if it is an integer
+    if (!PyLong_Check(po_number)){
+        PyErr_SetString(PyExc_RuntimeError, "Parameter must be an integer");
+        return NULL;
+    }
+    //Extract the value
+    long device_number = PyLong_AsLong(po_number);
+    //Device number in range?
+    if ((device_number >= iJoyCount) || (device_number < 0)){
+        PyErr_SetString(PyExc_IndexError, "Device index out of bounds");
+        return NULL;
+    }
+
+    //Get device state
+    char keyboard_state[256];
+    memset(keyboard_state, '\0', 256);
+    HRESULT rv;
+    rv = lpJoysticks[device_number]->GetDeviceState(sizeof(keyboard_state), &keyboard_state);
+    if (rv != DI_OK){
+        switch (rv){
+        case DIERR_INPUTLOST:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Input lost");
+            return NULL;
+        case DIERR_INVALIDPARAM:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Invalid param");
+            return NULL;
+        case DIERR_NOTACQUIRED:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Not acquired");
+            return NULL;
+        case DIERR_NOTINITIALIZED:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Not initialized");
+            return NULL;
+        case E_PENDING:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Pending");
+            return NULL;
+        default:
+            PyErr_SetString(PyExc_IOError, "DirectInput error: Unknown");
+            return NULL;
+        }
+    }
+
+    //Make the dictionary
+    PyErr_SetString(PyExc_RuntimeError, "Unimplemented");
+    return NULL;
 }

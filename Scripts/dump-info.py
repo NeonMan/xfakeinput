@@ -36,7 +36,15 @@ print("-----------------------------------------------------")
 def get_state(dwUserIndex):
  for n in range(device_count):
   dinput.poll(n)
-  state = dinput.get_joystate2(n)
+  try:
+   #Keyboard is unimplemented and fails, hence the try/except
+   state = dinput.get_state(n)
+  except IOError as e:
+   print("IOError:", e)
+   continue
+  except Exception as e:
+   print("Error:", e)
+   continue
   info = dinput.device_info(n)
   print("%s:" % (info["InstanceName"]))
   keys = list(state.keys())
