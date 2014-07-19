@@ -27,4 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __PY_UTILS_H
 #include "py_common.h"
 
+PyObject* PyInit_util();
+
 #endif

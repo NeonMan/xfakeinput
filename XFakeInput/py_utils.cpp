@@ -24,7 +24,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "py_utils.h"
-#include <Python.h>
 #include <Windows.h>
 
 //Forward declaration of python exported functions
@@ -43,7 +42,7 @@ PyModuleDef UtilModule = {
 };
 
 ///Initialization function
-PyObject* PyInit_util(void){
+PyObject* PyInit_util(){
     return PyModule_Create(&UtilModule);
 }
 

@@ -35,12 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "py_dinput.h"
 #include "py_xfakeinput.h"
+#include "py_utils.h"
+#include "py_hidapi.h"
 
 int py_init(char* module){
     PyObject *pName, *pModule;
 
     PyImport_AppendInittab("dinput", &PyInit_dinput);
     PyImport_AppendInittab("xfi", &PyInit_xfi);
+    PyImport_AppendInittab("util", &PyInit_util);
+    PyImport_AppendInittab("hidapi", &PyInit_hidapi);
     Py_Initialize();
     PySys_SetPath(L"");
     pName = PyUnicode_FromString(module);

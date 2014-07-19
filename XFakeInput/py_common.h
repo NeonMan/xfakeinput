@@ -31,6 +31,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __PY_COMMON_H
 #define __PY_COMMON_H
 
+/*
+ * This strange inclusion of python.h forces linking against the 'release'
+ * version on the library even on debug builds.
+ */
+#ifndef NDEBUG
+#undef _DEBUG
+#define NDEBUG
+#include <Python.h>
+#define _DEBUG
+#undef NDEBUG
+#else
+#include <Python.h>
+#endif
+
 #define PYTHON_METHOD_DECL(F,N,I) {N,F,METH_VARARGS,I}
 #define PYTHON_END_METHOD_DECL {NULL,NULL,0,NULL}
 

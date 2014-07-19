@@ -83,9 +83,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DInput_layer.h" />
+    <ClInclude Include="hidapi\hidapi.h" />
     <ClInclude Include="python_layer.h" />
     <ClInclude Include="py_common.h" />
     <ClInclude Include="py_dinput.h" />
+    <ClInclude Include="py_hidapi.h" />
+    <ClInclude Include="py_utils.h" />
     <ClInclude Include="py_xfakeinput.h" />
     <ClInclude Include="XFakeInput.h" />
   </ItemGroup>
@@ -93,6 +96,8 @@
     <ClCompile Include="DInput_layer.cpp" />
     <ClCompile Include="python_layer.cpp" />
     <ClCompile Include="py_dinput.cpp" />
+    <ClCompile Include="py_hidapi.cpp" />
+    <ClCompile Include="py_utils.cpp" />
     <ClCompile Include="py_xfakeinput.cpp" />
     <ClCompile Include="XFakeInput.cpp" />
   </ItemGroup>

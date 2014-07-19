@@ -23,17 +23,25 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef __PY_DINPUT_H
-#define __PY_DINPUT_H
-#include "py_common.h"
-#include "DInput_layer.h"
+#include "py_hidapi.h"
+#include "hidapi/hidapi.h"
 
-// ----------------------------------------------------------
-// --- Variables and functions to setup the python module ---
-// ----------------------------------------------------------
+//Forward declaration of python exported functions
+// --- Empty ---
 
-extern PyModuleDef DInputModule;  ///<-- DInput module struct
-extern PyMethodDef DinputMethods[]; ///<-- DInput Methods array
-PyObject* PyInit_dinput(void);
+//Module method declarations
+PyMethodDef HidapiMethods[] = {
+    PYTHON_END_METHOD_DECL
+};
 
-#endif
+//Definition of DInput module
+PyModuleDef HidapiModule = {
+    PyModuleDef_HEAD_INIT, "hidapi", NULL, -1, HidapiMethods,
+    NULL, NULL, NULL, NULL
+};
+
+///Initialization function
+PyObject* PyInit_hidapi(){
+    return PyModule_Create(&HidapiModule);
+}
+

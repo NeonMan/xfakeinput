@@ -26,16 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __PY_XFAKEINPUT_H
 #define __PY_XFAKEINPUT_H
 
-#ifndef NDEBUG
-#undef _DEBUG
-#define NDEBUG
-#include <Python.h>
-#define _DEBUG
-#undef NDEBUG
-#else
-#include <Python.h>
-#endif
-
+#include "py_common.h"
 #include "XFakeInput.h"
 
 // ----------------------------------------------------------
