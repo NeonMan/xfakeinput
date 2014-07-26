@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="DInput_layer.cpp" />
+    <ClCompile Include="XFakeInput.cpp" />
+    <ClCompile Include="python_layer.cpp" />
+    <ClCompile Include="py_dinput.cpp">
+      <Filter>python-packages</Filter>
+    </ClCompile>
+    <ClCompile Include="py_hidapi.cpp">
+      <Filter>python-packages</Filter>
+    </ClCompile>
+    <ClCompile Include="py_utils.cpp">
+      <Filter>python-packages</Filter>
+    </ClCompile>
+    <ClCompile Include="py_xfakeinput.cpp">
+      <Filter>python-packages</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DInput_layer.h" />
+    <ClInclude Include="XFakeInput.h" />
+    <ClInclude Include="python_layer.h" />
+    <ClInclude Include="hidapi\hidapi.h">
+      <Filter>hidapi</Filter>
+    </ClInclude>
+    <ClInclude Include="py_common.h">
+      <Filter>python-packages</Filter>
+    </ClInclude>
+    <ClInclude Include="py_dinput.h">
+      <Filter>python-packages</Filter>
+    </ClInclude>
+    <ClInclude Include="py_hidapi.h">
+      <Filter>python-packages</Filter>
+    </ClInclude>
+    <ClInclude Include="py_utils.h">
+      <Filter>python-packages</Filter>
+    </ClInclude>
+    <ClInclude Include="py_xfakeinput.h">
+      <Filter>python-packages</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="hidapi">
+      <UniqueIdentifier>{b800ffc7-7a51-43d8-b117-0688f2659975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="python-packages">
+      <UniqueIdentifier>{ecc56267-4d6e-4d47-aa04-029727f594b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
