@@ -563,13 +563,17 @@ PyObject* di_get_keyboard(PyObject *self, PyObject *args){
     }
 
     //Make the dictionary
-    PyObject* return_list = PyList_New(0);
+    PyObject* key_list = PyList_New(0);
+    PyObject* return_dict = PyDict_New();
     PyObject* value;
 
     for (int i = 0; i < 256; ++i){
         value = PyLong_FromLong(keyboard_state[i]);
-        PyList_Append(return_list, value);
+        PyList_Append(key_list, value);
         Py_DecRef(value);
     }
-    return return_list;
+    PyDict_SetItemString(return_dict, "Keys", key_list);
+    Py_DecRef(key_list);
+
+    return return_dict;
 }
