@@ -217,27 +217,27 @@ DWORD py_GetState(DWORD dwUserIndex, x_original::XINPUT_STATE *pState_new){
     // -- TriggerLeft
     PyObject* value = PyDict_GetItemString(py_return, "TriggerL"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.bLeftTrigger = PyLong_AsLong(value);
+        pState_new->Gamepad.bLeftTrigger = (BYTE)PyLong_AsLong(value);
     // -- TriggerRight
     value = PyDict_GetItemString(py_return, "TriggerR"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.bRightTrigger = PyLong_AsLong(value);
+        pState_new->Gamepad.bRightTrigger = (BYTE)PyLong_AsLong(value);
     // -- ThumbLX
     value = PyDict_GetItemString(py_return, "ThumbLX"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.sThumbLX = PyLong_AsLong(value);
+        pState_new->Gamepad.sThumbLX = (SHORT)PyLong_AsLong(value);
     // -- ThumbLY
     value = PyDict_GetItemString(py_return, "ThumbLY"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.sThumbLY = PyLong_AsLong(value);
+        pState_new->Gamepad.sThumbLY = (SHORT)PyLong_AsLong(value);
     // -- ThumbRX
     value = PyDict_GetItemString(py_return, "ThumbRX"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.sThumbRX = PyLong_AsLong(value);
+        pState_new->Gamepad.sThumbRX = (SHORT)PyLong_AsLong(value);
     // -- ThumbRY
     value = PyDict_GetItemString(py_return, "ThumbRY"); //Borrowed reference
     if (value != NULL)
-        pState_new->Gamepad.sThumbRY = PyLong_AsLong(value);
+        pState_new->Gamepad.sThumbRY = (SHORT)PyLong_AsLong(value);
     //Buttons
     // -- A
     value = PyDict_GetItemString(py_return, "ButtonA"); //Borrowed reference

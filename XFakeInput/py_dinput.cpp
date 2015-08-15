@@ -563,6 +563,13 @@ PyObject* di_get_keyboard(PyObject *self, PyObject *args){
     }
 
     //Make the dictionary
-    PyErr_SetString(PyExc_RuntimeError, "Unimplemented");
-    return NULL;
+    PyObject* return_list = PyList_New(0);
+    PyObject* value;
+
+    for (int i = 0; i < 256; ++i){
+        value = PyLong_FromLong(keyboard_state[i]);
+        PyList_Append(return_list, value);
+        Py_DecRef(value);
+    }
+    return return_list;
 }

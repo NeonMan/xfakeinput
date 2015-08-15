@@ -27,19 +27,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hidapi/hidapi.h"
 
 //Forward declaration of python exported functions
-PyObject* hidapi_hid_init(PyObject* self, PyObject* args);                /* int (void) */
-PyObject* hidapi_hid_exit(PyObject* self, PyObject* args);                /* int (void) */
-PyObject* hidapi_hid_enumerate(PyObject* self, PyObject* args);           /* hid_dev_info (vid, pid) */
-PyObject* hidapi_hid_free_enumeration(PyObject* self, PyObject* args);    /* void (hid_dev_info) */
-PyObject* hidapi_hid_open(PyObject* self, PyObject* args);                /* hid_dev (vid, pid, serial) */
-PyObject* hidapi_hid_open_path(PyObject* self, PyObject* args);           /* hid_dev (path) */
-PyObject* hidapi_hid_write(PyObject* self, PyObject* args);               /* int (hid_dev, data, len) */
-PyObject* hidapi_hid_read_timeout(PyObject* self, PyObject* args);        /* int (hid_dev, data, len, timeout) */
-PyObject* hidapi_hid_read(PyObject* self, PyObject* args);                /* int (hid_dev, data, len, timeout) */
-PyObject* hidapi_hid_set_nonblocking(PyObject* self, PyObject* args);     /* int (hid_dev, nonblock) */
-PyObject* hidapi_hid_send_feature_report(PyObject* self, PyObject* args); /*int (hid_dev, data, len) */
-PyObject* hidapi_hid_get_feature_report(PyObject* self, PyObject* args);  /*int (hid_dev, data, len) */
-PyObject* hidapi_hid_close(PyObject* self, PyObject* args);               /* void (hid_dev) */
+PyObject* hidapi_hid_init(PyObject* self, PyObject* args);                  /* int (void) */
+PyObject* hidapi_hid_exit(PyObject* self, PyObject* args);                  /* int (void) */
+PyObject* hidapi_hid_enumerate(PyObject* self, PyObject* args);             /* hid_dev_info (vid, pid) */
+PyObject* hidapi_hid_free_enumeration(PyObject* self, PyObject* args);      /* void (hid_dev_info) */
+PyObject* hidapi_hid_open(PyObject* self, PyObject* args);                  /* hid_dev (vid, pid, serial) */
+PyObject* hidapi_hid_open_path(PyObject* self, PyObject* args);             /* hid_dev (path) */
+PyObject* hidapi_hid_write(PyObject* self, PyObject* args);                 /* int (hid_dev, data, len) */
+PyObject* hidapi_hid_read_timeout(PyObject* self, PyObject* args);          /* int (hid_dev, data, len, timeout) */
+PyObject* hidapi_hid_read(PyObject* self, PyObject* args);                  /* int (hid_dev, data, len, timeout) */
+PyObject* hidapi_hid_set_nonblocking(PyObject* self, PyObject* args);       /* int (hid_dev, nonblock) */
+PyObject* hidapi_hid_send_feature_report(PyObject* self, PyObject* args);   /*int (hid_dev, data, len) */
+PyObject* hidapi_hid_get_feature_report(PyObject* self, PyObject* args);    /*int (hid_dev, data, len) */
+PyObject* hidapi_hid_close(PyObject* self, PyObject* args);                 /* void (hid_dev) */
 PyObject* hidapi_hid_get_product_str(PyObject* self, PyObject* args);       /* int (hid_dev, str, maxlen) */
 PyObject* hidapi_hid_get_serial_number_str(PyObject* self, PyObject* args); /* int (hid_dev, str, maxlen) */
 PyObject* hidapi_hid_get_manufacturer_str(PyObject* self, PyObject* args);  /* int (hid_dev, str, maxlen) */
